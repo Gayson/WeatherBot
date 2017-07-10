@@ -1,0 +1,41 @@
+.img {
+    width: 400px;
+}
+
+img {
+    position: absolute;
+    z-index: -1;
+}
+
+.otherInfo {
+    height: 50px;
+}
+
+.title {
+    color: white;
+}
+
+.city {
+    padding: 15px 20px 0 30px;
+    display: inline-block;
+}
+
+.weatherInfo {
+    margin: 25px 0 25px 50px;
+    height: 100px;
+}
+
+.tempDiv, .weatherDiv {
+    float: left;
+}
+
+.tempDiv {
+    font-size: 56px;
+}
+
+.weatherDiv {
+    margin-left: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
