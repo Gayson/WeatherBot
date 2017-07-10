@@ -5,8 +5,9 @@ $(document).ready(function () {
     $('.minTemp').text('21');
     $('.weather').text('多云');
     $('.wind').text('南风微风');
-
-    
+    $('.livingIndex').text('紫外线');
+    $('.livingValue').text('三级');
+    $('.livingAdvice').text('注意防晒');
 });
 
 
