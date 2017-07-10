@@ -5,13 +5,29 @@ $(document).ready(function () {
     $('.minTemp').text('21');
     $('.weather').text('多云');
     $('.wind').text('南风微风');
-    alert(generateImage());
-})
+
+    
+});
 
 
 function generateImage() {
-    html2canvas($('.img')).then(function(canvas) {
+    return html2canvas($('.img')).then(function(canvas) {
         var url = canvas.toDataURL();
         return url;
     });
+}
+
+function getData(jsonData) {
+    var data;
+    try {
+        data = JSON.parse(jsonData);
+    } catch (e) {
+        console.log(e);
+    }
+    $('.city').text(data.city);
+    $('.date').text(data.date);
+    $('.maxTemp').text(data.maxTemp);
+    $('.minTemp').text(data.minTemp);
+    $('.weather').text(data.weather);
+    $('.wind').text(data.wind);
 }
