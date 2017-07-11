@@ -18,7 +18,7 @@
         <img src="lib/title.png" width="350px" height="200px">
         <div class="title">
             <div class="otherInfo">
-                <span class="city"></span>
+                <span class="location"></span>
                 <span class="date"></span>
             </div>
             <div class="weatherInfo">

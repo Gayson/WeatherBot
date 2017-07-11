@@ -1,29 +1,38 @@
 $(document).ready(function () {
-    $('.city').text('上海天气');
-    $('.date').text('07-10');
-    $('.maxTemp').text('30');
-    $('.minTemp').text('21');
-    $('.weather').text('多云');
-    $('.wind').text('南风微风');
-    $('.livingIndex').text('紫外线');
-    $('.livingValue').text('三级');
-    $('.livingAdvice').text('注意防晒');
+
+    var date = new Date();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+
+    var json = {};
+    json.location = '上海';
+    json.minTemp = 21;
+    json.maxTemp = 30;
+    json.weather = '多云';
+    json.wind = '南风微风';
+    json.livingIndex = ['紫外线','紫外线','紫外线'];
+    json.livingValue = ['三级','三级','三级'];
+    json.livingAdvice = ['注意防晒','注意防晒','注意防晒'];
+    getData(JSON.stringify(json));
+
+    $('.date').text(month + "-" + day);
     $('.weather').prepend("<i class='wi wi-cloud'></i>");
-    generateImage()
+    generateImage(json.location)
 });
 
 
-function generateImage() {
-    return html2canvas($('.img')).then(function(canvas) {
+function generateImage(location) {
+    return html2canvas($('.img')).then(function (canvas) {
         var base64 = canvas.toDataURL();
         $.ajax({
             type: "POST",
             url: "./php/saveImg.php",
             data: {
-                base64: base64
+                base64: base64,
+                location: location
             },
             dataType: "json",
-            success: function(){
+            success: function () {
                 console.log('transmit image success');
             }
         });
@@ -38,10 +47,17 @@ function getData(jsonData) {
     } catch (e) {
         console.log(e);
     }
-    $('.city').text(data.city);
-    $('.date').text(data.date);
+    $('.location').text(data.location);
     $('.maxTemp').text(data.maxTemp);
     $('.minTemp').text(data.minTemp);
     $('.weather').text(data.weather);
     $('.wind').text(data.wind);
+    $('.living').each(function (index, element) {
+        var livingIndex = "<span class='livingIndex'>" + data.livingIndex[index] + "</span>";
+        var livingValue = "<span class='livingValue'>" + data.livingValue[index] + "</span>";
+        var livingAdvice = "<span class='livingAdvice'>" + data.livingAdvice[index] + "</span>";
+        $('.living:eq('+index+')').append(livingIndex);
+        $('.living:eq('+index+')').append(livingValue);
+        $('.living:eq('+index+')').append(livingAdvice);
+    })
 }
