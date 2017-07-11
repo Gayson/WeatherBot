@@ -1,3 +1,10 @@
+<?php
+
+$data = $argv[2];
+
+echo "<script type='text/javascript'>getData($data);</script>";
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

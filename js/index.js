@@ -9,13 +9,25 @@ $(document).ready(function () {
     $('.livingValue').text('三级');
     $('.livingAdvice').text('注意防晒');
     $('.weather').prepend("<i class='wi wi-cloud'></i>");
+    generateImage()
 });
 
 
 function generateImage() {
     return html2canvas($('.img')).then(function(canvas) {
-        var url = canvas.toDataURL();
-        return url;
+        var base64 = canvas.toDataURL();
+        $.ajax({
+            type: "POST",
+            url: "./php/saveImg.php",
+            data: {
+                base64: base64
+            },
+            dataType: "json",
+            success: function(){
+                console.log('transmit image success');
+            }
+        });
+        return base64;
     });
 }
 
