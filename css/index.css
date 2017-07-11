@@ -20,8 +20,18 @@ img {
     display: inline-block;
 }
 
+.warning {
+    background-color: red;
+    border-radius: 10px;
+    float: right;
+    padding: 5px;
+    margin-top: 10px;
+    margin-right: 20px;
+    font-weight: bold;
+}
+
 .weatherInfo {
-    margin: 30px 0 25px 35px;
+    margin: 10px 0 20px 45px;
     height: 100px;
 }
 
@@ -31,11 +41,20 @@ img {
 
 .tempDiv {
     margin-top: 10px;
-    font-size: 40px;
+    font-size: 32px;
+    line-height: 30px;
+}
+
+.aqiDiv {
+    text-align: center;
+    margin-top: 5px;
+    font-weight: bold;
+    font-size: 24px;
 }
 
 .weatherDiv {
-    margin-left: 20px;
+    margin-left: 25px;
+    margin-top: 15px;
     font-size: 20px;
     font-weight: bold;
     text-align: center;
