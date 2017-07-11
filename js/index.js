@@ -6,10 +6,10 @@ $(document).ready(function () {
 
     var json = {};
     json.location = '上海';
-    json.warning = '';
+    json.warning = '高温预警';
     json.minTemp = 21;
     json.maxTemp = 30;
-    json.weather = 22;
+    json.weather = 16;
     json.wind = '南风微风';
     json.livingIndex = ['紫外线','紫外线','紫外线'];
     json.livingValue = ['三级','三级','三级'];
@@ -57,6 +57,9 @@ function getData(jsonData) {
     $('.aqi').text(data.aqi);
     if (data.warning === '')
         $('.warning').hide();
+    else {
+        $('.warning').text(data.warning);
+    }
     $('.living').each(function (index, element) {
         var livingIndex = "<span class='livingIndex'>" + data.livingIndex[index] + "</span>";
         var livingValue = "<span class='livingValue'>" + data.livingValue[index] + "</span>";
