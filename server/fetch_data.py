@@ -6,7 +6,8 @@ import hmac
 import base64
 import utils
 
-def getJsonpUrl(location):
+
+def get_jsonp_url(location):
     ts = int(time.time())  # 当前时间戳
     params = "ts={ts}&uid={uid}".format(ts=ts, uid=utils.UID)  # 构造验证参数字符串
 
@@ -22,13 +23,12 @@ def getJsonpUrl(location):
 
     # 构造最终请求的 url
     url = utils.WEATHER_NOW_API + "?location={}&".format(location) + \
-            params + '&sig=' + sig + "&callback=?"
+          params + '&sig=' + sig + "&callback=?"
     return url
 
 
-
 if __name__ == '__main__':
-    url = getJsonpUrl(utils.XUHUI_ID)
+    url = get_jsonp_url(utils.XUHUI_ID)
     res = urllib.urlopen(url)
     print res.getcode()
     for line in res:
