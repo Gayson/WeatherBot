@@ -8,6 +8,7 @@ $(document).ready(function () {
     $('.livingIndex').text('紫外线');
     $('.livingValue').text('三级');
     $('.livingAdvice').text('注意防晒');
+    $('.weather').prepend("<i class='wi wi-cloud'></i>");
 });
 
 

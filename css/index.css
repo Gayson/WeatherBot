@@ -21,7 +21,7 @@ img {
 }
 
 .weatherInfo {
-    margin: 25px 0 25px 50px;
+    margin: 25px 0 25px 55px;
     height: 100px;
 }
 
@@ -30,11 +30,12 @@ img {
 }
 
 .tempDiv {
-    font-size: 56px;
+    margin-top: 10px;
+    font-size: 40px;
 }
 
 .weatherDiv {
-    margin-left: 20px;
+    margin-left: 30px;
     font-size: 20px;
     font-weight: bold;
     text-align: center;
@@ -56,4 +57,8 @@ img {
 
 .livingAdvice, .livingIndex {
     width: 125px;
+}
+
+.weather i {
+    margin: 0 5px;
 }
