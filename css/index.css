@@ -62,3 +62,7 @@ img {
 .weather i {
     margin: 0 5px;
 }
+
+.body {
+    background-color: white;
+}
