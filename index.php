@@ -1,8 +1,8 @@
 <?php
 
-$data = $argv[2];
+//$data = $argv[2];
 
-echo "<script type='text/javascript'>getData($data);</script>";
+//echo "<script type='text/javascript'>getData($data);</script>";
 ?>
 
 <!DOCTYPE html>
@@ -15,7 +15,7 @@ echo "<script type='text/javascript'>getData($data);</script>";
 </head>
 <body>
     <div class="img">
-        <img src="lib/title.png" width="400px" height="200px">
+        <img src="lib/title.png" width="350px" height="200px">
         <div class="title">
             <div class="otherInfo">
                 <span class="city"></span>
