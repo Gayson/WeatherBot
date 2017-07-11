@@ -526,6 +526,9 @@ class WXBot:
             11 -> Empty
             99 -> Unknown
         :param msg_type_id: 消息类型id
+	    0 -> null
+	    2 -> File Helper
+	    3 -> 群聊
         :param msg: 消息结构体
         :return: 解析的消息
         """
