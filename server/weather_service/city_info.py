@@ -1,5 +1,4 @@
-from enums import TimeStatus
-from enums import AirType
+from server.enums import AirType
 
 
 # hour between 8 to 20
