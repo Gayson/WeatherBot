@@ -38,31 +38,7 @@ class WeatherBot(WXBot):
 					self.push_flag = True
 			else:
 				self.push_flag = False
-		
-		
-	#群发天气信息
-	def push_weather_information(self):
-		weather_img = "img/1.png"  	          #推送的天气图片
-		weather_txt = "测试"			  #推送的天气文本信息
-		#给联系人推送天气信息
-		for contact in self.target_contact:     
-			uid = self.get_user_id(contact["Name"])	
-			if uid is not None:
-				self.send_img_msg_by_uid(weather_img, uid)
-				self.send_msg_by_uid(weather_txt, uid)
-			else:
-				if self.DEBUG:
-					print "[ERROR] NOT FIND CONTACT %s." % (contact["Name"])	
-		#给群推送天气信息
-		for group in self.target_group:
-			uid = self.get_user_id(group["Name"])
-			if uid is not None:
-				self.send_img_msg_by_uid(weather_img, uid)
-				self.send_msg_by_uid(weather_txt, uid)
-			else:
-				if self.DEBUG:
-					print "[ERROR] NOT FIND GROUP %s." % (contact["Name"])
-	
+			
 	#获取初始配置信息
 	def load_conf(self):
 		try:
@@ -109,6 +85,16 @@ class WeatherBot(WXBot):
 				for keyVal in self.sync_key['List']]) 
 		return dic['BaseResponse']['Ret'] == 0     
 	
+	#判断某用户是否在推送列表中
+	def is_target(self, name):
+		for contact in self.target_contact:
+			if contact["Name"] == name:
+				return True;
+		for group in self.target_group:
+			if group["Name"] == name:
+				return True;
+		return False
+
 	#---------------------------------------------------------
 	#                         用户响应
 	#---------------------------------------------------------
@@ -118,7 +104,7 @@ class WeatherBot(WXBot):
                 uid = msg["user"]["id"]
 		if command == u"查看状态":                              #1-"查看状态"   
                 	self.show_status(uid)
-                elif command[:4] == u"设定时间":                        #2-"设定时间H:M"
+                elif len(command) > 4 and command[:4] == u"设定时间":   #2-"设定时间H:M"
                        	self.set_target_time(command[4:], uid)
                 elif command ==  u"开启定时群发":                       #3-"开启定时群发"
                     	self.open_schedule(uid)
@@ -126,7 +112,17 @@ class WeatherBot(WXBot):
                        	self.close_schedule(uid)
                 elif command == u"查看管理员列表":                      #5-"查看当前管理员列表"
                         self.check_admin_list(uid)
-               	elif command == u"管理员":                              #6-"显示管理员命令列表"         
+		elif command == u"查看联系人列表":			#6-"查看联系人列表"
+			self.check_contact_list(uid)
+		elif command == u"查看推送列表":			#7-"查看推送列表"
+			self.check_push_list(uid)
+		elif len(command) > 4 and command[:4] == u"添加推送":	#8-"添加推送NickName"
+			self.add_push_by_name(command[4:], uid)		
+		elif len(command) > 4 and command[:4] == u"取消推送":	#9-"取消推送NickName"
+			self.cancel_push_by_name(command[4:], uid)
+		elif command == u"立即推送":				#10-"立即推送"
+			self.push_weather_information()			
+               	elif command == u"管理员":                              #11-"显示管理员命令列表"         
                         self.check_admin_command_list(uid)
                                                                         
 	#----------------------2.通用命令响应--------------------
@@ -189,16 +185,109 @@ class WeatherBot(WXBot):
                 for admin in self.admin_list:
                 	reply += admin["Name"]+"\n"
                	self.send_msg_by_uid(reply[:-1], uid)  	
+			
+	#6.查看联系人列表----"查看联系人列表"
+	def check_contact_list(self, uid):
+		#联系人
+		num_of_contact = len(self.contact_list)
+		reply = u"%i名联系人：\n" % (num_of_contact)
+		for contact in self.contact_list:
+			reply += contact["NickName"] + "\n"
 		
-	#6.显示管理员命令列表----"管理员"
-	def check_admin_command_list(self, uid):
-		reply = "管理员命令：\n"
+		#微信群
+		num_of_group = len(self.group_list)
+		reply += u"%i个微信群：\n" % (num_of_group)
+		for group in self.group_list:
+			reply += group["NickName"] + "\n"
+		self.send_msg_by_uid(reply[:-1], uid)
+	
+	#7.查看推送列表----"查看推送列表"
+	def check_push_list(self, uid):
+		num_of_contact = len(self.target_contact)
+		reply = u"%i名推送用户: \n" % (num_of_contact)
+		for contact in self.target_contact:
+			reply += contact["Name"] + "\n"
+
+                num_of_group = len(self.target_group)
+                reply += u"%i个推送的微信群：\n" % (num_of_group)
+                for group in self.target_group:
+                        reply += group["Name"] + "\n"
+                self.send_msg_by_uid(reply[:-1], uid)
+	
+	#8.添加推送----"添加推送：NickName"
+	def add_push_by_name(self, name, uid):
+		if self.is_target(name):
+			reply = "该用户已在推送列表"
+		else:
+			target_id = self.get_user_id(name)
+			if target_id == "" or target_id == "":
+				reply = "用户不存在"
+			elif self.is_contact(target_id):
+				self.target_contact.append({"Name":name})
+				self.set_conf()
+				reply = "需推送的联系人添加成功"
+			elif self.is_group(target_id):
+				self.target_group.append({"Name":name})
+				self.set_conf()
+				reply = "需推送的微信群添加成功"
+			else:
+				reply = "用户类型错误"
+		self.send_msg_by_uid(reply, uid)
+
+	#9.删除推送----"取消推送：NickName"
+	def cancel_push_by_name(self, name, uid):
+		for index in range(len(self.target_contact)):
+			if self.target_contact[index]["Name"] == name:
+				del self.target_contact[index]
+				self.set_conf()
+				self.send_msg_by_uid("取消推送联系人成功", uid)
+				return True
+		for index in range(len(self.target_group)):
+			if self.target_group[index]["Name"] == name:
+				del self.target_group[index]
+				self.set_conf()
+				self.send_msg_by_uid("取消推送微信群成功", uid)
+				return True
+		self.send_msg_by_uid("未找到联系人", uid)
+ 	
+        #10.群发天气信息----"立即推送"
+        def push_weather_information(self):
+                weather_img = "img/1.png"                 #推送的天气图片
+                weather_txt = "测试"                      #推送的天气文本信息
+                #给联系人推送天气信息
+                for contact in self.target_contact:
+                        uid = self.get_user_id(contact["Name"])
+                        if uid is not None:
+                                self.send_img_msg_by_uid(weather_img, uid)
+                                self.send_msg_by_uid(weather_txt, uid)
+                        else:
+                                if self.DEBUG:
+                                        print "[ERROR] NOT FIND CONTACT %s." % (contact["Name"])
+                #给群推送天气信息
+                for group in self.target_group:
+                        uid = self.get_user_id(group["Name"])
+                        if uid is not None:
+                                self.send_img_msg_by_uid(weather_img, uid)
+                                self.send_msg_by_uid(weather_txt, uid)
+                        else:
+                                if self.DEBUG:
+                                        print "[ERROR] NOT FIND GROUP %s." % (contact["Name"])
+
+        #11.显示管理员命令列表----"管理员"
+        def check_admin_command_list(self, uid):
+                reply = "管理员命令：\n"
                 reply += "1.查看状态\n"
                 reply += "2.设定时间H:M\n"
                 reply += "3.开启定时群发\n"
                 reply += "4.关闭定时群发\n"
-                reply += "5.查看管理员列表"
+                reply += "5.查看管理员列表\n"
+		reply += "6.查看联系人列表\n"
+		reply += "7.查看推送列表\n"
+		reply += "8.添加推送:NickName\n"
+		reply += "9.取消推送:NickName\n"
+		reply += "10.立即推送"
                 self.send_msg_by_uid(reply, uid)
+
 	#-------------------------------------------------------------------------
 	#-----------------------普通用户命令(通用功能)----------------------------
 	#1.为特定目标推送天气信息----"天气"
@@ -211,6 +300,10 @@ class WeatherBot(WXBot):
 	#2.普通用户升级为管理员----"天王盖地虎，宝塔镇河妖"
 	def upgrade_to_admin(self, uid): 
 		admin_name = self.get_contact_prefer_name(self.get_contact_name(uid))
+		for admin in self.admin_list:
+			if admin_name == admin["Name"]:
+				self.send_msg_by_uid("你当前已是管理员，回复\"管理员\"获得命令列表", uid)
+				return None
                 self.admin_list.append({"Name": admin_name})                    #添加当前用户至管理员
                 self.set_conf()
                 self.send_msg_by_uid("管理员模式开启,回复\"管理员\"获得命令列表", uid)

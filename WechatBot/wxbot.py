@@ -464,6 +464,12 @@ class WXBot:
             if uid == account['UserName']:
                 return True
         return False
+	
+    def is_group(self, uid):
+	for account in self.group_list:
+		if uid == account['UserName']:
+			return True
+	return False
 
     def handle_msg_all(self, msg):
         """
