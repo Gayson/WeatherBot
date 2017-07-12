@@ -1,6 +1,7 @@
 <?php
 
 $base64 = $_POST['base64'];
+
 if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64, $result)) {
     $type = $result[2];
     $img = "../image/" . iconv('utf-8', 'gb2312//IGNORE', $_POST['location']) . date('md', time()) . ".{$type}";
