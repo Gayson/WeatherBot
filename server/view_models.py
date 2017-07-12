@@ -1,5 +1,5 @@
 # coding=utf-8
-from enums import LifeIndex
+from server.enums import LifeIndex
 
 
 class PicMessage(object):
@@ -18,7 +18,7 @@ class PicMessage(object):
             'livingValue': [],
             'livingAdvice': [],
             'aqi': air_index['aqi'],
-            'quality': air_index['quality'],
+            'quality':str(air_index['quality']),
             'warning': self.get_alarm_brief(alarm_info)
         }
 
@@ -37,12 +37,10 @@ class PicMessage(object):
 
     @staticmethod
     def get_alarm_brief(alarm_info):
-        inner_a_info = alarm_info['results'][0]['alarms']
-        if len(inner_a_info) == 1:
-            return inner_a_info[0]['type'] + inner_a_info[0]['level'] + '预警'
+        alarms = alarm_info['results'][0]['alarms']
+        if len(alarms) >= 1:
+            return alarms[0]['type'] + alarms[0]['level'] + '预警'
         return '无预警'
-
-
 
 
 class ImpMessage(object):
@@ -53,5 +51,13 @@ class ReplyMessage(object):
     pass
 
 
-class alarmMessage(object):
-    pass
+class AlarmMessage(object):
+    def __init__(self, alarms):
+        self.results = '[今日预警]\n'
+
+        for alarm in alarms:
+            self.results += ('--%s%s%s--\n' % (alarm['type'], alarm['level'], '预警'))
+            self.results += alarm['description'] + '\n\n'
+
+
+

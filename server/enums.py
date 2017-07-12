@@ -138,3 +138,8 @@ class LifeIndex(object):
         '',
         '',
     ]
+
+
+class AlarmStatus(enum.Enum):
+    ACTIVE = 0,
+    INACTIVE = 1
