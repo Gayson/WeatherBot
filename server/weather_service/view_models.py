@@ -5,6 +5,9 @@ from enums import LifeIndex
 class PicMessage(object):
     def __init__(self, city_info, life_info, alarm_info):
         weather_info = city_info.total_info['daily_weather']
+        air_index = city_info.total_info['daily_air_index']
+        cur_life_info = life_info['results'][0]['suggestion']
+
         self.result = {
             'minTemp': weather_info['low'],
             'maxTemp': weather_info['high'],
@@ -14,11 +17,12 @@ class PicMessage(object):
             'livingIndex': [],
             'livingValue': [],
             'livingAdvice': [],
+            'aqi': air_index['aqi'],
+            'quality': air_index['quality'],
             'warning': self.get_alarm_brief(alarm_info)
         }
 
         total_count = 0
-        cur_life_info = life_info['results'][0]['suggestion']
         for i in range(0, len(LifeIndex.life_list)):
             for exclude_index in LifeIndex.exclude_list[i]:
                 if total_count == 3:
