@@ -1,6 +1,7 @@
 from enums import TimeStatus
 from enums import AirType
 
+
 # hour between 8 to 20
 class CityInfo(object):
     START_HOUR = 8

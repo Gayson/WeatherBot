@@ -1,8 +1,10 @@
 # coding=utf-8
-LOCATION = 'shanghai'  # 所查询的位置，可以使用城市拼音、v3 ID、经纬度等
+LOCATION = '上海'  # 所查询的位置，可以使用城市拼音、v3 ID、经纬度等
+IMP_LOCATION = '徐家汇'
 
 CITY_API = 'https://api.seniverse.com/v3/location/search.json'
 LIFE_API = 'https://api.seniverse.com/v3/life/suggestion.json'  # API URL，可替换为其他 URL
+ALARM_API = 'https://api.seniverse.com/v3/weather/alarm.json'
 
 WEATHER_DAILY_API = 'https://api.seniverse.com/v3/weather/daily.json'
 WEATHER_NOW_API = 'https://api.seniverse.com/v3/weather/now.json'

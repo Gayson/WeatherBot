@@ -84,3 +84,57 @@ class WeatherType(enum.Enum):
             return WeatherType.HOT
         if code == 99:
             return WeatherType.UNKNOWN
+
+
+class LifeIndex(object):
+
+    life_list = ['umbrella',
+                 'air_pollution',
+                 'uv',
+                 'chill',
+                 'flu',
+                 'traffic',
+                 'mood',
+                 'dressing',
+                 'comfort',
+                 'makeup',
+                 ]
+
+    life_name_list = [
+        '雨伞',
+        '污染扩散',
+        '紫外线',
+        '风寒',
+        '感冒',
+        '交通',
+        '心情',
+        '穿衣',
+        '舒适度',
+        '化妆',
+    ]
+
+    exclude_list = [
+        ['不带伞'],
+        [''],
+        ['弱'],
+        ['无'],
+        ['少发'],
+        ['良好'],
+        [''],
+        [''],
+        ['舒适'],
+        ['']
+    ]
+
+    suggestion_list = [
+        '出门请带伞',
+        '减少室外活动',
+        '请做好防晒措施',
+        '请做好防寒准备',
+        '请做好防范',
+        '请提前出门',
+        '及时调整心情',
+        '根据温度调整',
+        '',
+        '',
+    ]

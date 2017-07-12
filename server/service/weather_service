@@ -5,10 +5,11 @@ import urllib
 import requests
 import sys
 import json
-import CityInfo
+from city_info import CityInfo
 from server import utils
 from enums import TimeStatus
 from enums import WeatherType
+from view_models import PicMessage
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -19,12 +20,13 @@ class WeatherService(object):
 
     def __init__(self):
         self.total_info = {}
+        self.life_index = {}
         try:
             for city_name, city_id in self.get_distinct_id(utils.LOCATION):
-                city = CityInfo.CityInfo(city_name=city_name, city_id=city_id)
+                city = CityInfo(city_name=city_name, city_id=city_id)
                 self.city_list[city_name] = city
 
-            self.refresh()
+                # self.refresh()
 
         except Exception, e:
             print traceback.print_exc()
@@ -70,12 +72,13 @@ class WeatherService(object):
     '''
     depends on XuHui and ShangHai info
     '''
+
     def refresh_total_info(self):
-        sh_info = self.get_city_info('上海')
-        sh_code_type = WeatherType.get_weather_type(sh_info.total_info['code_day'])
+        sh_info = self.get_city(utils.LOCATION)
+        sh_code_type = WeatherType.get_weather_type(sh_info.total_info['daily_weather']['code_day'])
         count = 0
-        for city_info in self.city_list:
-            code = city_info.total_info['weather']['code_day']
+        for city_info in self.city_list.values():
+            code = city_info.total_info['daily_weather']['code_day']
             code_type = WeatherType.get_weather_type(code)
 
             # distinct weather equal to shanghai weather
@@ -85,8 +88,12 @@ class WeatherService(object):
         # if half of distinct in shanghai have the same weather type to shanghai
         if count >= len(self.city_list):
             self.total_info = sh_info
+            cur_city = utils.LOCATION
         else:
-            self.total_info = self.get_city_info('徐家汇')
+            self.total_info = self.get_city(utils.IMP_LOCATION)
+            cur_city = utils.IMP_LOCATION
+
+        self.life_index = self.fetch_api(cur_city, utils.LIFE_API)
 
     @staticmethod
     def get_distinct_id(city_name):
@@ -103,18 +110,30 @@ class WeatherService(object):
         except Exception, e:
             print traceback.print_exc()
 
-    def get_city_info(self, city_name, hour=-1):
+    def get_city(self, city_name, hour=-1):
         if city_name in self.city_list.keys():
             return self.city_list[city_name]
         else:
             return self.fetch_api(city_name, utils.WEATHER_NOW_API, 1)
 
+    @staticmethod
+    def get_publish_message():
+        service.refresh_total_info()
 
+        ci = service.total_info
+        li = service.life_index
+        ai = service.fetch_api(utils.LOCATION, utils.ALARM_API)
+        pic_message = PicMessage(ci, li, ai)
+
+        pic_message_json = json.dumps(pic_message.__dict__, ensure_ascii=False)
+        print pic_message_json
 
 
 # test
 
 if __name__ == '__main__':
     service = WeatherService()
+    service.refresh()
+    service.refresh_total_info()
 
-    print service.get_city_info('徐家汇').total_info
+
