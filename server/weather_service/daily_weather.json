@@ -1,0 +1,31 @@
+{
+  "results": [
+    {
+      "location": {
+        "name": "\u91d1\u5c71",
+        "country": "CN",
+        "timezone_offset": "+08:00",
+        "path": "\u91d1\u5c71,\u4e0a\u6d77,\u4e2d\u56fd",
+        "timezone": "Asia/Shanghai",
+        "id": "WTQQBVVG9ZMN"
+      },
+      "daily": [
+        {
+          "text_night": "\u591a\u4e91",
+          "wind_speed": "10",
+          "wind_direction_degree": "180",
+          "wind_direction": "\u5357",
+          "high": "33",
+          "precip": "",
+          "low": "27",
+          "wind_scale": "2",
+          "date": "2017-07-11",
+          "code_night": "4",
+          "code_day": "10",
+          "text_day": "\u9635\u96e8"
+        }
+      ],
+      "last_update": "2017-07-11T08:00:00+08:00"
+    }
+  ]
+}

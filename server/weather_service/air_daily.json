@@ -1,0 +1,29 @@
+{
+  "results": [
+    {
+      "last_update": "2017-07-11T13:00:00+08:00",
+      "location": {
+        "name": "\u91d1\u5c71",
+        "country": "CN",
+        "timezone_offset": "+08:00",
+        "path": "\u91d1\u5c71,\u4e0a\u6d77,\u4e2d\u56fd",
+        "timezone": "Asia/Shanghai",
+        "id": "WTQQBVVG9ZMN"
+      },
+      "air": {
+        "city": {
+          "co": "0.530",
+          "pm10": "28",
+          "o3": "153",
+          "quality": "\u4f18",
+          "last_update": "2017-07-11T13:00:00+08:00",
+          "so2": "6",
+          "pm25": "18",
+          "aqi": "48",
+          "no2": "14"
+        },
+        "stations": None
+      }
+    }
+  ]
+}
