@@ -12,6 +12,7 @@
     "html2canvas": "^0.5.0-beta4",
     "jquery": "^3.2.1",
     "jsdom": "^11.1.0",
-    "webpack": "^3.2.0"
+    "webpack": "^3.2.0",
+    "webpage": "^0.3.0"
   }
 }

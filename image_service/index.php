@@ -1,8 +1,8 @@
 <?php
 
-$data = $argv[1];
-echo $data;
-//echo "<script type='text/javascript'>getData($data);</script>";
+require './php/getData.php';
+
+
 ?>
 
 <!DOCTYPE html>
@@ -15,23 +15,23 @@ echo $data;
 </head>
 <body>
     <div class="img">
-        <img src="lib/sunny.jpg" width="350px" height="200px">
+        <img src="<?php $dataObj->getImgPath() ?>" width="350px" height="200px">
         <div class="title">
             <div class="otherInfo">
-                <span class="location"></span>
-                <span class="date"></span>
-                <span class="warning"></span>
+                <span class="location"><?php $dataObj->getLocation() ?></span>
+                <span class="date"><?php $dataObj->getDate() ?></span>
+                <span class="warning"><?php $dataObj->getWarning() ?></span>
             </div>
             <div class="weatherInfo">
                 <div class="tempDiv">
                     <i class="wi wi-thermometer"></i>
-                    <span class="maxTemp"></span>&#176;&nbsp;/
-                    <span class="minTemp"></span>&#176;
-                    <div class="aqiDiv">AQI:<span class="aqi"></span></div>
+                    <span class="maxTemp"><?php $dataObj->getMaxTemp() ?></span>&#176;&nbsp;/
+                    <span class="minTemp"><?php $dataObj->getMinTemp() ?></span>&#176;
+                    <div class="aqiDiv">AQI:<span class="aqi"><?php $dataObj->getAqi() ?></span></div>
                 </div>
                 <div class="weatherDiv">
-                    <div class="weather"></div>
-                    <div class="wind"></div>
+                    <div class="weather"><?php $dataObj->getWeather() ?></div>
+                    <div class="wind"><?php $dataObj->getWind() ?></div>
                 </div>
             </div>
         </div>
@@ -55,5 +55,5 @@ echo $data;
     </div>
 </body>
 
-<script src="bundle.js"></script>
+
 </html>

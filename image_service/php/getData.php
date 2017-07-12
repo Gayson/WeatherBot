@@ -1,64 +1,84 @@
 <?php
-$method = $argv[1];
-$parameter = $argv[2];
+try {
+    global $argv;
+    $parameter = $argv[1];
+} catch (Exception $e) {
+}
+
 $dataObj = new Data;
 
+require('util.php');
+
 class Data {
-    private $city, $date, $maxTemp, $minTemp, $weather, $wind;
+    private $location, $date, $warning, $aqi, $maxTemp, $minTemp, $weather, $icon, $imgPath, $wind;
     private $livingIndex, $livingValue, $livingAdvice;
 
-    public function setData($jsonData) {
+    function setData($jsonData) {
         $data = json_decode($jsonData);
-        $this->city = $data->{'city'};
+        $this->location = $data->{'location'};
         $this->date = $data->{'date'};
+        $this->warning = $data->{'warning'};
+        $this->aqi = $data->{'aqi'};
         $this->maxTemp = $data->{'maxTemp'};
         $this->minTemp = $data->{'minTemp'};
-        $this->weather = $data->{'weather'};
+        code2weather($data->{'weather'}, $this->weather, $this->icon, $this->imgPath);
         $this->wind = $data->{'wind'};
-        $this->livingIndex = json_decode($data->{'livingIndex'}, true);
-        $this->livingValue = json_decode($data->{'livingValue'}, true);
-        $this->livingAdvice = json_decode($data->{'livingAdvice'}, true);
+        //$this->livingIndex = json_decode($data->{'livingIndex'}, true);
+        //$this->livingValue = json_decode($data->{'livingValue'}, true);
+        //$this->livingAdvice = json_decode($data->{'livingAdvice'}, true);
     }
 
-    public function getCity() {
-        return $this->city;
+    function getLocation() {
+        echo $this->location;
     }
 
-    public function getDate() {
-        return $this->date;
+    function getDate() {
+        echo $this->date;
     }
 
-    public function getMaxTemp() {
-        return $this->maxTemp;
+    function getWarning() {
+        echo $this->warning;
     }
 
-    public function getMinTemp() {
-        return $this->minTemp;
+    function getAqi() {
+        echo $this->aqi;
     }
 
-    public function getWeather() {
-        return $this->weather;
+    function getMaxTemp() {
+        echo $this->maxTemp;
     }
 
-    public function getWind() {
-        return $this->wind;
+    function getMinTemp() {
+        echo $this->minTemp;
     }
 
-    public function getLivingIndex() {
-        return $this->livingIndex;
+    function getWeather() {
+        echo $this->weather.$this->icon;
     }
 
-    public function getLivingValue() {
-        return $this->livingValue;
+    function getImgPath() {
+        echo $this->imgPath;
     }
 
-    public function getLivingAdvice() {
-        return $this->livingAdvice;
+    function getWind() {
+        echo $this->wind;
+    }
+
+    function getLivingIndex() {
+        echo $this->livingIndex;
+    }
+
+    function getLivingValue() {
+        echo $this->livingValue;
+    }
+
+    function getLivingAdvice() {
+        echo $this->livingAdvice;
     }
 }
 
-if (isset($method) && $method != "" && isset($parameter) && $parameter != "") {
-    $dataObj->$method($parameter);
+if (isset($parameter) && $parameter != "") {
+    $dataObj->setData($parameter);
 } else {
-    echo "Function call error";
+    $dataObj->setData("{\"location\":\"上海\",\"date\":\"7/13\",\"warning\":\"高温预警\",\"minTemp\":21,\"maxTemp\":30,\"weather\":4,\"wind\":\"南风微风\",\"livingIndex\":[\"紫外线\",\"紫外线\",\"紫外线\"],\"livingValue\":[\"三级\",\"三级\",\"三级\"],\"livingAdvice\":[\"注意防晒\",\"注意防晒\",\"注意防晒\"],\"aqi\":\"优\"}");
 }
