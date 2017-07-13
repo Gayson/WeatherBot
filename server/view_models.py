@@ -58,6 +58,7 @@ class LifeMessage(object):
             'livingIndex': [],
             'livingAdvice': [],
             'livingValue': [],
+            'details': [],
         }
 
         total_count = 0
