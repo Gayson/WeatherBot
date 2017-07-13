@@ -40,6 +40,26 @@ class LifeMessage(object):
             'details': [],
         }
 
+        life_message = LifeMessage(life_info)
+        self.result = dict(self.result, **life_message.result)
+
+    @staticmethod
+    def get_alarm_brief(alarm_info):
+        alarms = alarm_info
+        if len(alarms) >= 1:
+            return alarms[0]['type'] + alarms[0]['level'] + '预警'
+        return '无预警'
+
+
+class LifeMessage(object):
+
+    def __init__(self, life_info):
+        self.result = {
+            'livingIndex': [],
+            'livingAdvice': [],
+            'livingValue': [],
+        }
+
         total_count = 0
         for i in range(0, len(LifeIndex.life_list)):
             for exclude_index in LifeIndex.exclude_list[i]:

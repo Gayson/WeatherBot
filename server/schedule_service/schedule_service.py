@@ -15,7 +15,7 @@ sys.setdefaultencoding('utf-8')
 
 class ScheduleService(object):
     INTERVAL_WEATHER_REFRESH = 3600
-    INTERVAL_ALARM_REFRESH = 180
+    INTERVAL_ALARM_REFRESH = 3
 
     pub_alarms = []
 
@@ -68,4 +68,3 @@ class ScheduleService(object):
         sched_thread = threading.Thread(target=self.schedule.run, args=())
         sched_thread.setDaemon(True)
         sched_thread.start()
-

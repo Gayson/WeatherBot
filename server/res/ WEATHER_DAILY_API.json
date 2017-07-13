@@ -1,1 +1,3 @@
 {u'results': [{u'location': {u'name': u'上海', u'country': u'CN', u'timezone_offset': u'+08:00', u'path': u'上海,上海,中国', u'timezone': u'Asia/Shanghai', u'id': u'WTW3SJ5ZBJUY'}, u'daily': [{u'text_night': u'多云', u'wind_speed': u'10', u'wind_direction_degree': u'180', u'wind_direction': u'南', u'high': u'37', u'precip': u'', u'low': u'29', u'wind_scale': u'2', u'date': u'2017-07-13', u'code_night': u'4', u'code_day': u'4', u'text_day': u'多云'}], u'last_update': u'2017-07-13T08:00:00+08:00'}]}
+
+

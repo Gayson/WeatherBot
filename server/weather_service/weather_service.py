@@ -36,6 +36,7 @@ class WeatherService(object):
     def refresh(self):
         hour = TimeStatus.get_hour()
         for city in self.city_list.values():
+
             city_id = city.city_id
             city.refresh_daily_weather(utils.filter_fetch_api(city_id, utils.API_LIST['WEATHER_DAILY_API'], 1))
             city.refresh_hour_weather(utils.filter_fetch_api(city_id, utils.API_LIST['WEATHER_HOURLY_API'], 1), hour)

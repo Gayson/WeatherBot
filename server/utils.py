@@ -85,7 +85,7 @@ def filter_fetch_api(location, api, days=0):
 
     if api == API_LIST['AIR_DAILY_API']:
         return json_res['daily'][day_index]
-
+      
     if api == API_LIST['AIR_HOURLY_API']:
         return json_res['hourly']
 
