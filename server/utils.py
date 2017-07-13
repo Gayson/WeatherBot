@@ -3,6 +3,8 @@ import requests
 import urllib
 import sys
 import json
+import time
+from setting import setting
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -30,6 +32,12 @@ UNIT = 'c'
 
 API_KEY = 'cmm7uo5ftsziioro'
 UID = 'UEE3F1CD43'
+
+# 图片保存路径
+
+
+def get_image_path():
+    return setting.PROJECT_DIR + '/server/img/%s/%s.png' % (LOCATION, time.strftime("%m-%d", time.localtime(time.time())))
 
 
 def fetch_api(location, api, days=0):
@@ -108,6 +116,3 @@ def test_days_api(location='shanghai', days=3):
     # res_str = res_str.replace('u', '')
     with open('./res/ WEATHER_DAYS_API.json', 'w') as f:
         f.write(res_str)
-
-if __name__ == '__main__':
-    test_days_api()

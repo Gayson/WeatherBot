@@ -129,7 +129,8 @@ class WeatherService(object):
                              utils.filter_fetch_api(city_name, utils.API_LIST['LIFE_API'], days=days))
         return message.result
 
-if __name__ == '__main__':
-    service = WeatherService()
-    # service.refresh()
-    print service.get_city_message('徐家汇', hour=18, days=1)
+# if __name__ == '__main__':
+#     service = WeatherService()
+#     service.refresh()
+#     # print service.get_city_message('徐家汇', hour=18, days=1)
+#     print service.get_publish_message()
