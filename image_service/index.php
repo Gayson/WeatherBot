@@ -1,7 +1,6 @@
 <?php
 
 require './php/getData.php';
-
 ?>
 
 <!DOCTYPE html>
@@ -34,7 +33,6 @@ require './php/getData.php';
                 <div class="weatherDiv">
                     <div class="weather"><?php $dataObj->getWeather() ?></div>
                     <div class="wind"><?php $dataObj->getWind() ?></div>
-                    <div class="humidity"><?php $dataObj->getHumidity() ?>%</div>
                 </div>
             </div>
         </div>
