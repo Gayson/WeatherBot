@@ -77,7 +77,7 @@ class ReplyMessage(object):
             self.day = '后天'
         else:
             today = time.strftime('%d', time.localtime(time.time()))
-            self.day = '%d日' % (int(today) + days - 1)
+            self.day = '%d日' % (int(today) + days)
 
     def set_data(self, weather_info, air_index, life_info):
         if self.hour != -1:
@@ -109,4 +109,4 @@ class AlarmMessage(object):
 
         for alarm in alarms:
             self.result += ('--%s%s%s--\n' % (alarm['type'], alarm['level'], '预警'))
-            self.result += alarm['description'] + '\n\n'
+            self.result += alarm['description'] + '\n'

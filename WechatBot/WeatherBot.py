@@ -2,6 +2,9 @@
 # coding: utf-8
 #
 
+import sys
+
+sys.path.append("..")
 from wxbot import *
 from datetime import datetime
 
@@ -12,10 +15,11 @@ from server.schedule_service.schedule_service import ScheduleService
 class WeatherBot(WXBot):
     push_flag = False  # 定时推送的标志，避免重复推送
     schedule_enable = True  # 定时任务使能
-    set_time = {"hour": 11, "minute": 51}  # 定时推送时间，默认六点四十
-    admin_list = [{"Name": "顺达"}]  # 管理员列表
-    target_contact = [{"Name": "顺达"}]  # 需要推送的联系人
-    target_group = [{"Name": "爆炸开发"}]  # 需要推送的群
+    set_time = {}  # 定时推送时间
+    admin_list = []  # 管理员列表
+    target_contact = []  # 需要推送的联系人
+    target_group = []  # 需要推送的群
+    admin_password = ""  # 管理员口令
 
     # 响应接收到的消息
     def handle_msg_all(self, msg):
@@ -38,7 +42,10 @@ class WeatherBot(WXBot):
             if now.hour == self.set_time["hour"] and now.minute == self.set_time["minute"]:
                 if self.push_flag == False:
                     print "target time!"
-                    self.push_weather_information()
+                    msg = self.weather_service.get_publish_message()
+                    self.push_msg_to_target_contact(msg, False)
+                    self.push_msg_to_target_group(msg, False)
+                    # self.push_weather_information()
                     self.push_flag = True
             else:
                 self.push_flag = False
@@ -53,13 +60,15 @@ class WeatherBot(WXBot):
             self.admin_list = conf["admin_list"]
             self.target_contact = conf["target_contact"]
             self.target_group = conf["target_group"]
+            self.admin_password = conf["admin_password"]
             conf_file.close()
         except:  # 设置为默认值
             self.conf_fichedule_enable = True  # 定时任务使能
-            set_time = {"hour": 6, "minute": 40}  # 定时推送时间，默认六点四十
-            admin_list = [{"Name": "顺达"}]  # 管理员列表
-            target_contact = [{"Name": "顺达"}]  # 需要推送的联系人
-            target_group = [{"Name": "爆炸开发"}]  # 需要推送的群
+            self.set_time = {"hour": 6, "minute": 40}  # 定时推送时间，默认六点四十
+            self.admin_list = [{"Name": "顺达"}]  # 管理员列表
+            self.target_contact = [{"Name": "顺达"}]  # 需要推送的联系人
+            self.target_group = [{"Name": "爆炸开发"}]  # 需要推送的群
+            self.admin_password = u"天王盖地虎宝塔镇河妖"  # 默认管理员口令
 
     # 更新配置信息
     def set_conf(self):
@@ -70,6 +79,7 @@ class WeatherBot(WXBot):
         conf["admin_list"] = self.admin_list
         conf["target_contact"] = self.target_contact
         conf["target_group"] = self.target_group
+        conf["admin_password"] = self.admin_password
         conf_file.write(json.dumps(conf))
         conf_file.close()
 
@@ -87,6 +97,8 @@ class WeatherBot(WXBot):
         self.my_account = dic['User']
         self.sync_key_str = '|'.join([str(keyVal['Key']) + '_' + str(keyVal['Val'])
                                       for keyVal in self.sync_key['List']])
+
+
         return dic['BaseResponse']['Ret'] == 0
 
     # 判断某用户是否在推送列表中
@@ -135,7 +147,7 @@ class WeatherBot(WXBot):
         uid = msg["user"]["id"]
         if command == u"天气":  # 1-"天气"
             self.push_weather_to_one(uid)
-        elif command == u"天王盖地虎，宝塔镇河妖":  # 2-管理员特权口令
+        elif command == self.admin_password:  # 2-管理员特权口令
             self.upgrade_to_admin(uid)
 
         # ----------------------3.群消息响应----------------------
@@ -256,26 +268,16 @@ class WeatherBot(WXBot):
 
     # 10.群发天气信息----"立即推送"
     def push_weather_information(self):
+        # 调用weather_service接口获得天气信息
         weather_img = "img/1.png"  # 推送的天气图片
-        weather_txt = self.weather_service.get_publish_message()  # 推送的天气文本信息
-        # 给联系人推送天气信息
-        for contact in self.target_contact:
-            uid = self.get_user_id(contact["Name"])
-            if uid is not None:
-                self.send_img_msg_by_uid(weather_img, uid)
-                self.send_msg_by_uid(weather_txt, uid)
-            else:
-                if self.DEBUG:
-                    print "[ERROR] NOT FIND CONTACT %s." % (contact["Name"])
-                # 给群推送天气信息
-        for group in self.target_group:
-            uid = self.get_user_id(group["Name"])
-            if uid is not None:
-                self.send_img_msg_by_uid(weather_img, uid)
-                self.send_msg_by_uid(weather_txt, uid)
-            else:
-                if self.DEBUG:
-                    print "[ERROR] NOT FIND GROUP %s." % (contact["Name"])
+        self.push_msg_to_target_contact(weather_img, True)
+        self.push_msg_to_target_group(weather_img, True)
+
+        has_txt = True  # 存在第二条文本消息
+        weather_txt = "今天天气真好"
+        if has_txt:
+            self.push_msg_to_target_contact(weather_txt)
+            self.push_msg_to_target_group(weather_txt)
 
     # 11.显示管理员命令列表----"管理员"
     def check_admin_command_list(self, uid):
@@ -295,13 +297,17 @@ class WeatherBot(WXBot):
     # -------------------------------------------------------------------------
     # -----------------------普通用户命令(通用功能)----------------------------
     # 1.为特定目标推送天气信息----"天气"
-    def push_weather_to_one(self, uid, city="default"):
+    def push_weather_to_one(self, uid, city="default", day=-1):
+        # 这里调用接口获得天气信息
         weather_img = "img/1.png"  # 推送的天气图片
-        weather_txt = "测试"  # 推送的天气文本信息
         self.send_img_msg_by_uid(weather_img, uid)
-        self.send_msg_by_uid(weather_txt, uid)
 
-    # 2.普通用户升级为管理员----"天王盖地虎，宝塔镇河妖"
+        has_txt = True
+        if has_txt:  # 存在第二条文本消息
+            weather_txt = "这是一条测试信息"
+            self.send_msg_by_uid(weather_txt, uid)
+
+    # 2.普通用户升级为管理员（输入管理员口令）
     def upgrade_to_admin(self, uid):
         admin_name = self.get_contact_prefer_name(self.get_contact_name(uid))
         for admin in self.admin_list:
@@ -342,23 +348,52 @@ class WeatherBot(WXBot):
             if is_at_me:
                 self.push_weather_to_one(msg["user"]["id"])
 
-    def set_weather_service(self, w_s):
-        self.weather_service = w_s
+    # ---------------------------通用群发函数------------------------------
+    # 群发消息给推送列表里的联系人
+    def push_msg_to_target_contact(self, msg, isImg=False):
+        for contact in self.target_contact:
+            uid = self.get_user_id(contact["Name"])
+            if uid is not None:
+                if isImg:
+                    self.send_img_msg_by_uid(msg, uid)
+                else:
+                    self.send_msg_by_uid(msg, uid)
+            else:
+                if self.DEBUG:
+                    print "[ERROR] NOT FIND CONTACT %s." % (contact["Name"])
+
+    # 群发消息给推送列表里的微信群
+    def push_msg_to_target_group(self, msg, isImg=False):
+        for group in self.target_group:
+            uid = self.get_user_id(group["Name"])
+            if uid is not None:
+                if isImg:
+                    self.send_img_msg_by_uid(msg, uid)
+                else:
+                    self.send_msg_by_uid(msg, uid)
+            else:
+                if self.DEBUG:
+                    print "[ERROR] NOT FIND GROUP %s." % (group["Name"])
+
+    def set_weather_service(self, weather_service):
+        self.weather_service = weather_service
 
 
 def main():
     # 启动天气服务
     weather_service = WeatherService()
     weather_service.refresh()
-    # 启动定时服务
-    ScheduleService.start_service(weather_service)
 
     bot = WeatherBot()
     bot.set_weather_service(weather_service)
+
+    # 启动定时服务
+    schedule_service = ScheduleService(weather_service, bot)
+    schedule_service.start_service()
+
     bot.DEBUG = True
     bot.conf['qr'] = 'tty'
     bot.run()
-
 
 if __name__ == '__main__':
     main()

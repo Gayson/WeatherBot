@@ -129,5 +129,5 @@ class WeatherService(object):
 
 if __name__ == '__main__':
     service = WeatherService()
-    service.refresh()
-    print service.get_city_message('上海', hour=18)
+    # service.refresh()
+    print service.get_city_message('徐家汇', hour=18, days=1)

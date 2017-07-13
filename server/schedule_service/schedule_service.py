@@ -15,24 +15,23 @@ sys.setdefaultencoding('utf-8')
 
 class ScheduleService(object):
     INTERVAL_WEATHER_REFRESH = 3600
-    INTERVAL_ALARM_REFRESH = 3
+    INTERVAL_ALARM_REFRESH = 180
 
     pub_alarms = []
 
-    def __init__(self, weather_service):
+    def __init__(self, weather_service, bot):
         self.weather_service = weather_service
         self.schedule = sched.scheduler(time.time, time.sleep)
+        self.bot = bot
         # self.render = PicRender('nothing')
 
-        # self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, ())
+        self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, ())
         self.schedule.enter(self.INTERVAL_ALARM_REFRESH, 0, self.fetch_alarm, (utils.LOCATION,))
-
-        self.schedule.run()
 
     def refresh_cache(self):
         self.weather_service.refresh()
         msg = self.weather_service.get_publish_message()
-        self.render.pic_ctx.call('render_pic', msg)
+        # self.render.pic_ctx.call('render_pic', msg)
         self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, ())
 
     def fetch_alarm(self, location):
@@ -60,26 +59,13 @@ class ScheduleService(object):
 
         if len(res_alarms) > 0:
             message = AlarmMessage(res_alarms)
-            print message.result.encode('utf-8')
-        else:
-            print 'no alarm'
+            self.bot.push_msg_to_target_contact(message.result, False)
+            self.bot.push_msg_to_target_group(message.result, False)
 
         self.schedule.enter(self.INTERVAL_ALARM_REFRESH, 0, self.fetch_alarm, (location,))
 
-    @staticmethod
-    def start_service(weather_service):
-        sched_thread = threading.Thread(target=ScheduleService.init, args=(weather_service,))
+    def start_service(self):
+        sched_thread = threading.Thread(target=self.schedule.run, args=())
         sched_thread.setDaemon(True)
         sched_thread.start()
 
-    @staticmethod
-    def init(weather_service):
-        service = ScheduleService(weather_service)
-
-
-if __name__ == '__main__':
-    ScheduleService.start_service(None)
-    print 'hhhhhh'
-    while 1:
-        if input() == 'q':
-            break
