@@ -143,3 +143,8 @@ class LifeIndex(object):
 class AlarmStatus(enum.Enum):
     ACTIVE = 0,
     INACTIVE = 1
+
+
+class ReplyTemplate(enum.Enum):
+    temp_1 = '今日最高气温%d度，最低气温%d度，%s，空气质量指数%d，%s\n' \
+             '%s。%s。%s。'
