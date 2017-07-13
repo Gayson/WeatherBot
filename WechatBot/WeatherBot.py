@@ -13,13 +13,13 @@ from server.schedule_service.schedule_service import ScheduleService
 
 
 class WeatherBot(WXBot):
-    push_flag = False  # 定时推送的标志，避免重复推送
-    schedule_enable = True  # 定时任务使能
-    set_time = {}  # 定时推送时间
-    admin_list = []  # 管理员列表
-    target_contact = []  # 需要推送的联系人
-    target_group = []  # 需要推送的群
-    admin_password = ""  # 管理员口令
+    push_flag = False 			 # 定时推送的标志，避免重复推送
+    schedule_enable = True 		 # 定时任务使能
+    set_time = {} 				 # 定时推送时间
+    admin_list = [] 			 # 管理员列表
+    target_contact = [] 		 # 需要推送的联系人
+    target_group = [] 		 # 需要推送的群
+    admin_password = "" 		 # 管理员口令
 
     # 响应接收到的消息
     def handle_msg_all(self, msg):
@@ -63,12 +63,12 @@ class WeatherBot(WXBot):
             self.admin_password = conf["admin_password"]
             conf_file.close()
         except:  # 设置为默认值
-            self.conf_fichedule_enable = True  # 定时任务使能
-            self.set_time = {"hour": 6, "minute": 40}  # 定时推送时间，默认六点四十
-            self.admin_list = [{"Name": "顺达"}]  # 管理员列表
-            self.target_contact = [{"Name": "顺达"}]  # 需要推送的联系人
-            self.target_group = [{"Name": "爆炸开发"}]  # 需要推送的群
-            self.admin_password = u"天王盖地虎宝塔镇河妖"  # 默认管理员口令
+            self.conf_fichedule_enable = True 				 # 定时任务使能
+            self.set_time = {"hour": 6, "minute": 40} 		 # 定时推送时间，默认六点四十
+            self.admin_list = [{"Name": "顺达"}] 			 # 管理员列表
+            self.target_contact = [{"Name": "顺达"}] 		 # 需要推送的联系人
+            self.target_group = [{"Name": "爆炸开发"}] 		 # 需要推送的群
+            self.admin_password = u"天王盖地虎宝塔镇河妖" 	 # 默认管理员口令
 
     # 更新配置信息
     def set_conf(self):
@@ -115,45 +115,72 @@ class WeatherBot(WXBot):
     #                         用户响应
     # ---------------------------------------------------------
     # ----------------------1.管理员用户响应-------------------
-    def handle_admin_msg(self, msg):  # --------管理员命令---------
+    def handle_admin_msg(self, msg): 									 # --------管理员命令---------
         command = msg["content"]["data"]
         uid = msg["user"]["id"]
-        if command == u"查看状态":  # 1-"查看状态"
+        if command == u"查看状态":											 # 1-"查看状态"
             self.show_status(uid)
-        elif len(command) > 4 and command[:4] == u"设定时间":  # 2-"设定时间H:M"
+        elif len(command) > 4 and command[:4] == u"设定时间": 				 # 2-"设定时间H:M"
             self.set_target_time(command[4:], uid)
-        elif command == u"开启定时群发":  # 3-"开启定时群发"
+        elif command == u"开启定时群发": 									 # 3-"开启定时群发"
             self.open_schedule(uid)
-        elif command == u"关闭定时群发":  # 4-"关闭定时群发"
+        elif command == u"关闭定时群发":								     # 4-"关闭定时群发"
             self.close_schedule(uid)
-        elif command == u"查看管理员列表":  # 5-"查看当前管理员列表"
+        elif command == u"查看管理员列表":								     # 5-"查看当前管理员列表"
             self.check_admin_list(uid)
-        elif command == u"查看联系人列表":  # 6-"查看联系人列表"
+        elif command == u"查看联系人列表": 									 # 6-"查看联系人列表"
             self.check_contact_list(uid)
-        elif command == u"查看推送列表":  # 7-"查看推送列表"
+        elif command == u"查看推送列表":								     # 7-"查看推送列表"
             self.check_push_list(uid)
-        elif len(command) > 4 and command[:4] == u"添加推送":  # 8-"添加推送NickName"
+        elif len(command) > 4 and command[:4] == u"添加推送": 				 # 8-"添加推送NickName"
             self.add_push_by_name(command[4:], uid)
-        elif len(command) > 4 and command[:4] == u"取消推送":  # 9-"取消推送NickName"
-            self.cancel_push_by_name(command[4:], uid)
-        elif command == u"立即推送":  # 10-"立即推送"
+        elif len(command) > 4 and command[:4] == u"取消推送": 				 # 9-"取消推送NickName"
+            self.cancel_push_by_name(command[4:], uid)	
+        elif command == u"立即推送": 										 # 10-"立即推送"
             self.push_weather_information()
-        elif command == u"管理员":  # 11-"显示管理员命令列表"
+        elif command == u"管理员": 											 # 11-"显示管理员命令列表"
             self.check_admin_command_list(uid)
 
     # ----------------------2.通用命令响应--------------------
-    def handle_common_msg(self, msg):  # ---------通用命令-----------
+    def handle_common_msg(self, msg): 									 # ---------通用命令-----------
         command = msg["content"]["data"]
         uid = msg["user"]["id"]
-        if command == u"天气":  # 1-"天气"
+        if command == u"天气": 												 # 1-"天气"
             self.push_weather_to_one(uid)
-        elif command == self.admin_password:  # 2-管理员特权口令
+        elif command == self.admin_password:							     # 2-管理员特权口令
             self.upgrade_to_admin(uid)
 
-        # ----------------------3.群消息响应----------------------
+    # ----------------------3.群消息响应----------------------
+    # 1.响应@消息
+    def handle_group_msg(self, msg):
+        print msg["content"]
+        if "detail" in msg["content"]:
+            # 获取机器人名字列表
+            my_names = self.get_group_member_name(msg["user"]["id"], self.my_account["UserName"])
+            if my_names is None:
+                my_names = {}
+            if "NickName" in self.my_account and self.my_account["NickName"]:
+                my_names["nickname2"] = self.my_account["NickName"]
+            if "RemarkName" in self.my_account and self.my_account["RemarkName"]:
+                my_names["remark_name2"] = self.my_account["RemarkName"]
+
+            # 判断是否at自己
+            is_at_me = False
+            for detail in msg["content"]["detail"]:
+                print detail["value"]
+                if detail["type"] == "at" or (detail["value"] != "" and detail["value"][0] == u"@"):
+                    # 微信网页版@信息是str类型，@字符包含在"value"中
+                    print msg["content"]["detail"]
+                    for k in my_names:
+                        if my_names[k] and detail["value"].find(my_names[k]) != -1:
+                            is_at_me = True
+                            break
+            # 推送消息
+            if is_at_me:
+                self.push_weather_to_one(msg["user"]["id"])
 
     # --------------------------------------------------------
-    #			命令实现
+    #			    命令实现
     # --------------------------------------------------------
     # ----------------------管理员命令------------------------
     # 1.发送当前机器人状态----"查看状态"
@@ -297,7 +324,7 @@ class WeatherBot(WXBot):
     # -------------------------------------------------------------------------
     # -----------------------普通用户命令(通用功能)----------------------------
     # 1.为特定目标推送天气信息----"天气"
-    def push_weather_to_one(self, uid, city="default", day=-1):
+    def push_weather_to_one(self, uid, city="default", day=0):
         # 这里调用接口获得天气信息
         weather_img = "img/1.png"  # 推送的天气图片
         self.send_img_msg_by_uid(weather_img, uid)
@@ -318,37 +345,26 @@ class WeatherBot(WXBot):
         self.set_conf()
         self.send_msg_by_uid("管理员模式开启,回复\"管理员\"获得命令列表", uid)
 
-    # ------------------------------------------------------------------------
-    # ---------------------------群消息响应-----------------------------------
-    # 1.响应@消息
-    def handle_group_msg(self, msg):
-        print msg["content"]
-        if "detail" in msg["content"]:
-            # 获取机器人名字列表
-            my_names = self.get_group_member_name(msg["user"]["id"], self.my_account["UserName"])
-            if my_names is None:
-                my_names = {}
-            if "NickName" in self.my_account and self.my_account["NickName"]:
-                my_names["nickname2"] = self.my_account["NickName"]
-            if "RemarkName" in self.my_account and self.my_account["RemarkName"]:
-                my_names["remark_name2"] = self.my_account["RemarkName"]
+    # ----------------------------响应天气请求---------------------------------
+	#处理天气请求
+	def handle_weather_query(self, msg, uid):        
+		day = self.check_day(msg)			#0：今天 1：明天 2：后天
+		city = self.check_city(msg)
+		self.push_weather_to_one(uid, city, day)
+	
+	#判断城市
+	def check_city(self, msg):
+	
+	#判断今天、明天、后天
+	def check_day(msg):
+		day = 0
+		if msg.find(u"明天") != -1:
+			day = 1
+		elif msg.find(u"后天") != -1:
+			day = 2
+		return day
 
-            # 判断是否at自己
-            is_at_me = False
-            for detail in msg["content"]["detail"]:
-                print detail["value"]
-                if detail["type"] == "at" or (detail["value"] != "" and detail["value"][0] == u"@"):
-                    # 微信网页版@信息是str类型，@字符包含在"value"中
-                    print msg["content"]["detail"]
-                    for k in my_names:
-                        if my_names[k] and detail["value"].find(my_names[k]) != -1:
-                            is_at_me = True
-                            break
-            # 推送消息
-            if is_at_me:
-                self.push_weather_to_one(msg["user"]["id"])
-
-    # ---------------------------通用群发函数------------------------------
+    # ---------------------------通用群发函数----------------------------------
     # 群发消息给推送列表里的联系人
     def push_msg_to_target_contact(self, msg, isImg=False):
         for contact in self.target_contact:
@@ -377,7 +393,7 @@ class WeatherBot(WXBot):
 
     def set_weather_service(self, weather_service):
         self.weather_service = weather_service
-
+	
 
 def main():
     # 启动天气服务
