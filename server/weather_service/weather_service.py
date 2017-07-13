@@ -97,8 +97,8 @@ class WeatherService(object):
         pic_message_json = json.dumps(pic_message.__dict__, ensure_ascii=False)
         return pic_message_json
 
-    def get_city_message(self, city_name, hour=-1, day=0):
-        message = ReplyMessage()
+    def get_city_message(self, city_name, hour=-1, days=0):
+        message = ReplyMessage(city_name, hour, days)
         if hour != -1 and hour < CityInfo.START_HOUR:
             message.results = '这个点你就起床啦？看凌晨四点的太阳吗？'
             return message
@@ -106,22 +106,29 @@ class WeatherService(object):
             message.results = '这个点你不在家吗？这么舒服的吗？'
             return message
 
-        if city_name in self.city_list.keys():
-            city = self.city_list['city_name']
+        # 今日数据
+        if days == 0:
 
-            if hour == -1:
-                message.set_data(city.total_info['daily_weather'], city.total_info['daily_air_index'])
-            else:
-                message.set_data(city.hour_weather_info[hour - CityInfo.START_HOUR],
-                                 city.hour_air_info[hour - CityInfo.START_HOUR])
+            # 城市已缓存
+            if city_name in self.city_list.keys():
+                city = self.city_list[city_name]
+
+                life_info = utils.filter_fetch_api(city.city_id, utils.API_LIST['LIFE_API'])
+                if hour == -1:
+                    message.set_data(city.total_info['daily_weather'], city.total_info['daily_air_index'],
+                                     life_info)
+                else:
+                    message.set_data(city.hour_weather_info[hour - CityInfo.START_HOUR],
+                                     city.hour_air_info[hour - CityInfo.START_HOUR],
+                                     life_info)
+
         else:
-            message.set_data(utils.filter_fetch_api(city_name, utils.API_LIST['WEATHER_DAILY_API'])['results'][0]['daily'][0],
-                             utils.filter_fetch_api(city_name, utils.API_LIST['AIR_DAILY_API'])['results'][0]['air']['city'])
-
-        return message
-
+            message.set_data(utils.filter_fetch_api(city_name, utils.API_LIST['WEATHER_DAILY_API'], days=days),
+                             utils.filter_fetch_api(city_name, utils.API_LIST['AIR_DAILY_API'], days=days),
+                             utils.filter_fetch_api(city_name, utils.API_LIST['LIFE_API'], days=days))
+        return message.result
 
 if __name__ == '__main__':
     service = WeatherService()
-    service.refresh()
-    print service.get_publish_message()
+    # service.refresh()
+    print service.get_city_message('徐家汇', hour=18, days=1)
