@@ -24,6 +24,7 @@ class WeatherService(object):
 
     # 缓存的回复信息
     reply_msgs = {}
+    MAX_CACHE_SIZE = 10000
 
     def __init__(self):
         self.total_info = {}
@@ -132,12 +133,18 @@ class WeatherService(object):
             message.set_data(utils.filter_fetch_api(city_name, utils.API_LIST['WEATHER_DAILY_API'], days=days),
                              utils.filter_fetch_api(city_name, utils.API_LIST['AIR_DAILY_API'], days=days),
                              utils.filter_fetch_api(city_name, utils.API_LIST['LIFE_API'], days=days))
-        self.reply_msgs[key] = message.result
+
+        # 将回复消息缓存
+        if len(self.reply_msgs) == self.MAX_CACHE_SIZE:
+            self.reply_msgs[key] = message.result
         return message.result
 
 
 if __name__ == '__main__':
     service = WeatherService()
     # service.refresh()
+    print service.get_city_message('昌江', days=0)
+    print service.get_city_message('昌江', days=0)
+    print service.get_city_message('昌江', days=1)
     print service.get_city_message('昌江', days=0)
 # print service.get_publish_message()

@@ -74,7 +74,7 @@ def filter_fetch_api(location, api, days=0):
     if days != 0:
         days -= 1
 
-    print json_res
+    # print json_res
     if api == API_LIST['LIFE_API']:
         return json_res['suggestion']
 
