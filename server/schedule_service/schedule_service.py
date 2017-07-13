@@ -15,7 +15,7 @@ sys.setdefaultencoding('utf-8')
 
 class ScheduleService(object):
     INTERVAL_WEATHER_REFRESH = 3600
-    INTERVAL_ALARM_REFRESH = 180
+    INTERVAL_ALARM_REFRESH = 3
 
     pub_alarms = []
 
@@ -36,13 +36,11 @@ class ScheduleService(object):
         self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, ())
 
     def fetch_alarm(self, location):
-        alarms_info = utils.fetch_api(location, utils.ALARM_API)
-
-        alarms = alarms_info['results'][0]['alarms']
+        alarms = utils.filter_fetch_api(location, utils.API_LIST['ALARM_API'])
 
         res_alarms = []
 
-        if len(alarms) >= 1: # has alarms
+        if len(alarms) >= 1:  # has alarms
             for pub_alarm in self.pub_alarms:
                 pub_alarm.set_inactive()
 
@@ -66,11 +64,11 @@ class ScheduleService(object):
         else:
             print 'no alarm'
 
-        self.schedule.enter(self.INTERVAL_ALARM_REFRESH, 0, self.fetch_alarm, (utils.LOCATION,))
+        self.schedule.enter(self.INTERVAL_ALARM_REFRESH, 0, self.fetch_alarm, (location,))
 
     @staticmethod
     def start_service(weather_service):
-        sched_thread = threading.Thread(target= ScheduleService.init, args=(weather_service,))
+        sched_thread = threading.Thread(target=ScheduleService.init, args=(weather_service,))
         sched_thread.setDaemon(True)
         sched_thread.start()
 
@@ -85,5 +83,3 @@ if __name__ == '__main__':
     while 1:
         if input() == 'q':
             break
-
-
