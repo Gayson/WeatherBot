@@ -395,57 +395,33 @@ class WeatherBot(WXBot):
 def none():
     print 'none'
 
+
 def main():
     # 启动天气服务
-    weather_service = WeatherService()
-    weather_service.refresh()
-
-    # 启动机器人
-    bot = WeatherBot()
-    bot.set_weather_service(weather_service)
-
-    # 启动图片渲染服务
-    image_service = ImageService()
-    image_service.generate_image(weather_service.get_publish_message(),
-                                 utils.get_image_path(),
-                                 bot.set_image_exist)
-
-    # 启动定时服务
-    schedule_service = ScheduleService(weather_service, bot, image_service)
-    schedule_service.start_service()
-
-    bot.DEBUG = True
-    bot.conf['qr'] = 'tty'
-    bot.run()
-
-if __name__ == '__main__':
-    # main()
-
     print 'start'
-
     weather_service = WeatherService()
     weather_service.refresh()
 
-    print 'weather_service refresh over'
-
+    print 'weather_service init over'
     # 启动机器人
     bot = WeatherBot()
     bot.set_weather_service(weather_service)
-
-
-    # 启动图片渲染服务
-    image_service = ImageService()
-    image_service.generate_image(weather_service.get_publish_message(),
-                                 utils.get_image_path(),
-                                 bot.set_image_exist)
 
     print 'image create over'
+    # 启动图片渲染服务
+    image_service = ImageService()
+    image_service.generate_image(weather_service.get_publish_message(),
+                                 utils.get_image_path(),
+                                 bot.set_image_exist)
+
     # 启动定时服务
     schedule_service = ScheduleService(weather_service, bot, image_service)
     schedule_service.start_service()
 
     print 'start schedule'
+    bot.DEBUG = True
+    bot.conf['qr'] = 'tty'
+    bot.run()
 
-    while True:
-        if input() == 'q':
-            break
+if __name__ == '__main__':
+    main()
