@@ -6,7 +6,7 @@ from server.render.pic_render import PicRender
 from server import utils
 from alarm_info import PublishedAlarm
 from server.view_models import AlarmMessage
-
+import server.utils
 import threading
 
 reload(sys)
@@ -19,20 +19,26 @@ class ScheduleService(object):
 
     pub_alarms = []
 
-    def __init__(self, weather_service, bot):
+    def __init__(self, weather_service, bot, image_service):
         self.weather_service = weather_service
-        self.schedule = sched.scheduler(time.time, time.sleep)
         self.bot = bot
-        # self.render = PicRender('nothing')
+        self.image_service = image_service
 
-        self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, ())
+        self.schedule = sched.scheduler(time.time, time.sleep)
+        self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, self.refresh_over)
         self.schedule.enter(self.INTERVAL_ALARM_REFRESH, 0, self.fetch_alarm, (utils.LOCATION,))
 
     def refresh_cache(self):
         self.weather_service.refresh()
         msg = self.weather_service.get_publish_message()
-        # self.render.pic_ctx.call('render_pic', msg)
+
+        img_path = utils.IMAGE_PATH % (utils.LOCATION, time.strftime("%M-%d", time.localtime(time.time())))
+        self.image_service.generate_image(msg, img_path, )
         self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, ())
+
+    @staticmethod
+    def refresh_over():
+        print 'refresh over'
 
     def fetch_alarm(self, location):
         alarms = utils.filter_fetch_api(location, utils.API_LIST['ALARM_API'])

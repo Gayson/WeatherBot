@@ -10,7 +10,8 @@ from datetime import datetime
 
 from server.weather_service.weather_service import WeatherService
 from server.schedule_service.schedule_service import ScheduleService
-
+from image_service.interface import ImageService
+from server import utils
 
 class WeatherBot(WXBot):
     push_flag = False 			 # 定时推送的标志，避免重复推送
@@ -20,6 +21,8 @@ class WeatherBot(WXBot):
     target_contact = [] 		 # 需要推送的联系人
     target_group = [] 		 # 需要推送的群
     admin_password = "" 		 # 管理员口令
+
+    image_exist = False
 
     # 响应接收到的消息
     def handle_msg_all(self, msg):
@@ -40,11 +43,10 @@ class WeatherBot(WXBot):
             now = datetime.now()
             print now
             if now.hour == self.set_time["hour"] and now.minute == self.set_time["minute"]:
-                if self.push_flag == False:
+                if not self.push_flag and self.image_exist:
                     print "target time!"
-                    msg = self.weather_service.get_publish_message()
-                    self.push_msg_to_target_contact(msg, False)
-                    self.push_msg_to_target_group(msg, False)
+                    self.push_msg_to_target_contact(utils.get_image_path(), True)
+                    self.push_msg_to_target_group(utils.get_image_path(), True)
                     # self.push_weather_information()
                     self.push_flag = True
             else:
@@ -296,15 +298,24 @@ class WeatherBot(WXBot):
     # 10.群发天气信息----"立即推送"
     def push_weather_information(self):
         # 调用weather_service接口获得天气信息
-        weather_img = "img/1.png"  # 推送的天气图片
+        print '接受推送请求'
+        if self.image_exist:
+            weather_img = utils.get_image_path()
+        else:
+            weather_img = 'img/1.png'
+
+        print '获取图片路径'
         self.push_msg_to_target_contact(weather_img, True)
         self.push_msg_to_target_group(weather_img, True)
 
+        print '推送图片'
         has_txt = True  # 存在第二条文本消息
         weather_txt = "今天天气真好"
         if has_txt:
             self.push_msg_to_target_contact(weather_txt)
             self.push_msg_to_target_group(weather_txt)
+
+        print '推送第二条消息'
 
     # 11.显示管理员命令列表----"管理员"
     def check_admin_command_list(self, uid):
@@ -393,18 +404,28 @@ class WeatherBot(WXBot):
 
     def set_weather_service(self, weather_service):
         self.weather_service = weather_service
-	
+
+    def set_image_exist(self):
+        self.image_exist = True
+
 
 def main():
     # 启动天气服务
     weather_service = WeatherService()
     weather_service.refresh()
 
+    # 启动机器人
     bot = WeatherBot()
     bot.set_weather_service(weather_service)
 
+    # 启动图片渲染服务
+    image_service = ImageService()
+    image_service.generate_image(weather_service.get_publish_message(),
+                                 utils.get_image_path(),
+                                 bot.set_image_exist)
+
     # 启动定时服务
-    schedule_service = ScheduleService(weather_service, bot)
+    schedule_service = ScheduleService(weather_service, bot, image_service)
     schedule_service.start_service()
 
     bot.DEBUG = True
