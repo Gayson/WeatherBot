@@ -1,11 +1,10 @@
-from enums import TimeStatus
-from enums import AirType
+from server.enums import AirType
 
 
 # hour between 8 to 20
 class CityInfo(object):
-    START_HOUR = 8
-    END_HOUR = 20
+    START_HOUR = 6
+    END_HOUR = 22
 
     def __init__(self, city_name, city_id):
         self.city_name = city_name
@@ -19,13 +18,13 @@ class CityInfo(object):
         self.total_info = {}
 
     def refresh_daily_air_index(self, air_info):
-        self.daily['air'] = air_info['results'][0]['air']['city']
+        self.daily['air'] = air_info
 
     def refresh_daily_weather(self, weather_info):
-        self.daily['weather'] = weather_info['results'][0]['daily'][0]
+        self.daily['weather'] = weather_info
 
     def refresh_hour_air_index(self, air_index, hour):
-        air_list = air_index['results'][0]['hourly']
+        air_list = air_index
         if hour <= self.START_HOUR:
             self.hour_air_info = air_list[self.START_HOUR - hour:self.END_HOUR - hour]
         elif hour <= self.END_HOUR:
@@ -34,7 +33,7 @@ class CityInfo(object):
             self.hour_air_info = air_list[self.START_HOUR + 24 - hour:self.END_HOUR + 24 - hour]
 
     def refresh_hour_weather(self, _weather_info, hour):
-        weather_list = _weather_info['results'][0]['hourly']
+        weather_list = _weather_info
         if hour <= self.START_HOUR:
             self.hour_weather_info = weather_list[self.START_HOUR - hour:self.END_HOUR - hour]
         elif hour <= self.END_HOUR:
@@ -79,4 +78,4 @@ class CityInfo(object):
             weather['low'] = low
             weather['high'] = high
 
-        air_index['quality'] = AirType.get_air_type(air_index['aqi'])
+        air_index['quality'] = int(AirType.get_air_type(air_index['aqi']))

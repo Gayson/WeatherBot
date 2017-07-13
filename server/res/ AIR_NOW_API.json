@@ -1,0 +1,2 @@
+{u'results': [{u'last_update': u'2017-07-13T10:00:00+08:00', u'location': {u'name': u'上海', u'country': u'CN', u'timezone_offset': u'+08:00', u'path': u'上海,上海,中国', u'timezone': u'Asia/Shanghai', u'id': u'WTW3SJ5ZBJUY'}, u'air': {u'city': {u'co': u'0.770', u'pm10': u'71', u'o3': u'120', u'quality': u'良', u'last_update': u'2017-07-13T10:00:00+08:00', u'so2': u'12', u'pm25': u'42', u'aqi': u'61', u'no2': u'48'}, u'stations': None}}]}
+
