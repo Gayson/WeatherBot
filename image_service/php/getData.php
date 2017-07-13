@@ -1,7 +1,7 @@
 <?php
 try {
     $myfile = fopen("data.txt", "r") or die("Unable to open file!");
-    $parameter = fread($myfile,filesize("test.txt"));
+    $parameter = fread($myfile,filesize("data.txt"));
 } catch (Exception $e) {
 }
 
