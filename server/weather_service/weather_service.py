@@ -13,13 +13,17 @@ from server import utils
 from server.enums import TimeStatus, WeatherType
 from server.view_models import PicMessage, ReplyMessage
 
-
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 
 class WeatherService(object):
+
+    # 缓存的城市 仅限上海以及上海市的各区
     city_list = {}
+
+    # 缓存的回复信息
+    reply_msgs = {}
 
     def __init__(self):
         self.total_info = {}
@@ -34,11 +38,9 @@ class WeatherService(object):
         except Exception, e:
             print traceback.print_exc()
 
-
     def refresh(self):
         hour = TimeStatus.get_hour()
         for city in self.city_list.values():
-
             city_id = city.city_id
             city.refresh_daily_weather(utils.filter_fetch_api(city_id, utils.API_LIST['WEATHER_DAILY_API'], 1))
             city.refresh_hour_weather(utils.filter_fetch_api(city_id, utils.API_LIST['WEATHER_HOURLY_API'], 1), hour)
@@ -101,36 +103,41 @@ class WeatherService(object):
     def get_city_message(self, city_name, hour=-1, days=0):
         message = ReplyMessage(city_name, hour, days)
         if hour != -1 and hour < CityInfo.START_HOUR:
-            message.results = '这个点你就起床啦？看凌晨四点的太阳吗？'
-            return message
+            message.result = '这个点你就起床啦？看凌晨四点的太阳吗？'
+            return message.result
         elif hour > CityInfo.END_HOUR:
-            message.results = '这个点你不在家吗？这么舒服的吗？'
-            return message
+            message.result = '这个点你不在家吗？这么舒服的吗？'
+            return message.result
+
+        # 尝试从缓存获取
+        key = city_name + str(days) + str(hour)
+        if key in self.reply_msgs.keys():
+            return self.reply_msgs[key]
 
         # 今日数据
-        if days == 0:
-
+        if days == 0 and city_name in self.city_list.keys():
             # 城市已缓存
-            if city_name in self.city_list.keys():
-                city = self.city_list[city_name]
+            city = self.city_list[city_name]
 
-                life_info = utils.filter_fetch_api(city.city_id, utils.API_LIST['LIFE_API'])
-                if hour == -1:
-                    message.set_data(city.total_info['daily_weather'], city.total_info['daily_air_index'],
-                                     life_info)
-                else:
-                    message.set_data(city.hour_weather_info[hour - CityInfo.START_HOUR],
-                                     city.hour_air_info[hour - CityInfo.START_HOUR],
-                                     life_info)
+            life_info = utils.filter_fetch_api(city.city_id, utils.API_LIST['LIFE_API'])
+            if hour == -1:
+                message.set_data(city.total_info['daily_weather'], city.total_info['daily_air_index'],
+                                 life_info)
+            else:
+                message.set_data(city.hour_weather_info[hour - CityInfo.START_HOUR],
+                                 city.hour_air_info[hour - CityInfo.START_HOUR],
+                                 life_info)
 
         else:
             message.set_data(utils.filter_fetch_api(city_name, utils.API_LIST['WEATHER_DAILY_API'], days=days),
                              utils.filter_fetch_api(city_name, utils.API_LIST['AIR_DAILY_API'], days=days),
                              utils.filter_fetch_api(city_name, utils.API_LIST['LIFE_API'], days=days))
+        self.reply_msgs[key] = message.result
         return message.result
 
-# if __name__ == '__main__':
-#     service = WeatherService()
-#     service.refresh()
-#     # print service.get_city_message('徐家汇', hour=18, days=1)
-#     print service.get_publish_message()
+
+if __name__ == '__main__':
+    service = WeatherService()
+    # service.refresh()
+    print service.get_city_message('昌江', days=0)
+# print service.get_publish_message()

@@ -63,18 +63,18 @@ class ReplyMessage(object):
         self.result = None
         self.location = city_name
 
-        if hour == -1 or days != 0:
+        if hour == -1 or days <= 1:
             self.hour = -1
             self.template = ReplyTemplate.temp_1
         else:
             self.hour = hour
             self.template = ReplyTemplate.temp_hour
 
-        if days == 0:
+        if days <= 1:
             self.day = '今日'
-        elif days == 1:
-            self.day = '明日'
         elif days == 2:
+            self.day = '明日'
+        elif days == 3:
             self.day = '后天'
         else:
             today = time.strftime('%d', time.localtime(time.time()))

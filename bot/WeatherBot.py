@@ -392,6 +392,8 @@ class WeatherBot(WXBot):
     def set_image_exist(self):
         self.image_exist = True
 
+def none():
+    print 'none'
 
 def main():
     # 启动天气服务
@@ -417,4 +419,33 @@ def main():
     bot.run()
 
 if __name__ == '__main__':
-    main()
+    # main()
+
+    print 'start'
+
+    weather_service = WeatherService()
+    weather_service.refresh()
+
+    print 'weather_service refresh over'
+
+    # 启动机器人
+    bot = WeatherBot()
+    bot.set_weather_service(weather_service)
+
+
+    # 启动图片渲染服务
+    image_service = ImageService()
+    image_service.generate_image(weather_service.get_publish_message(),
+                                 utils.get_image_path(),
+                                 bot.set_image_exist)
+
+    print 'image create over'
+    # 启动定时服务
+    schedule_service = ScheduleService(weather_service, bot, image_service)
+    schedule_service.start_service()
+
+    print 'start schedule'
+
+    while True:
+        if input() == 'q':
+            break

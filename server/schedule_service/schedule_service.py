@@ -14,8 +14,8 @@ sys.setdefaultencoding('utf-8')
 
 
 class ScheduleService(object):
-    INTERVAL_WEATHER_REFRESH = 3600
-    INTERVAL_ALARM_REFRESH = 3
+    INTERVAL_WEATHER_REFRESH = 30
+    INTERVAL_ALARM_REFRESH = 180
 
     pub_alarms = []
 
@@ -29,6 +29,8 @@ class ScheduleService(object):
         self.schedule.enter(self.INTERVAL_ALARM_REFRESH, 0, self.fetch_alarm, (utils.LOCATION,))
 
     def refresh_cache(self):
+
+        print 'refresh weather service'
         self.weather_service.refresh()
         msg = self.weather_service.get_publish_message()
 
@@ -41,6 +43,8 @@ class ScheduleService(object):
         print 'refresh over'
 
     def fetch_alarm(self, location):
+
+        print 'fetch alarm'
         alarms = utils.filter_fetch_api(location, utils.API_LIST['ALARM_API'])
 
         res_alarms = []
