@@ -129,3 +129,33 @@ function code2weather($code, &$weather, &$icon, &$imgPath)
             break;
     }
 }
+
+function code2AqiQuality($code, &$aqiQuality) {
+    switch ($code) {
+        case 0:
+            $aqiQuality = '优';
+            break;
+        case 1:
+            $aqiQuality = '良';
+            break;
+        case 2:
+            $aqiQuality = '轻度污染';
+            break;
+        case 3:
+            $aqiQuality = '中度污染';
+            break;
+        case 4:
+            $aqiQuality = '重度污染';
+            break;
+        case 5:
+            $aqiQuality = '严重污染';
+            break;
+    }
+}
+
+function warningComponent($warning, &$warningComponent) {
+    if ($warning !== '无预警')
+        $warningComponent = "<span class=\"warning\">".$warning."</span>";
+    else
+        $warningComponent = '';
+}

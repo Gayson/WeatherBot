@@ -1,7 +1,6 @@
 <?php
 try {
-    global $argv;
-    $parameter = $argv[1];
+    $parameter = $_GET['data'];
 } catch (Exception $e) {
 }
 
@@ -10,22 +9,30 @@ $dataObj = new Data;
 require('util.php');
 
 class Data {
-    private $location, $date, $warning, $aqi, $maxTemp, $minTemp, $weather, $icon, $imgPath, $wind;
+    private $location, $date, $warning, $aqi, $aqiQuality, $maxTemp, $minTemp,
+        $weather, $icon, $imgPath, $wind, $humidity;
     private $livingIndex, $livingValue, $livingAdvice;
 
     function setData($jsonData) {
         $data = json_decode($jsonData);
+        $data = $data->{'result'};
+
         $this->location = $data->{'location'};
         $this->date = $data->{'date'};
         $this->warning = $data->{'warning'};
-        $this->aqi = $data->{'aqi'};
+        $this->aqi = (int)$data->{'aqi'};
         $this->maxTemp = $data->{'maxTemp'};
         $this->minTemp = $data->{'minTemp'};
+        $this->wind = $data->{'wind'}.'风';
+        $this->humidity = $data->{'humidity'};
+
         code2weather($data->{'weather'}, $this->weather, $this->icon, $this->imgPath);
-        $this->wind = $data->{'wind'};
-        //$this->livingIndex = json_decode($data->{'livingIndex'}, true);
-        //$this->livingValue = json_decode($data->{'livingValue'}, true);
-        //$this->livingAdvice = json_decode($data->{'livingAdvice'}, true);
+        code2AqiQuality($data->{'quality'}, $this->aqiQuality);
+        warningComponent($data->{'warning'}, $this->warning);
+
+        $this->livingIndex = $data->{'livingIndex'};
+        $this->livingValue = $data->{'livingValue'};
+        $this->livingAdvice = $data->{'livingAdvice'};
     }
 
     function getLocation() {
@@ -42,6 +49,10 @@ class Data {
 
     function getAqi() {
         echo $this->aqi;
+    }
+
+    function getAqiQuality() {
+        echo $this->aqiQuality;
     }
 
     function getMaxTemp() {
@@ -64,21 +75,25 @@ class Data {
         echo $this->wind;
     }
 
-    function getLivingIndex() {
-        echo $this->livingIndex;
+    function getHumidity() {
+        echo $this->humidity;
     }
 
-    function getLivingValue() {
-        echo $this->livingValue;
+    function getLivingIndex($index) {
+        echo $this->livingIndex[$index];
     }
 
-    function getLivingAdvice() {
-        echo $this->livingAdvice;
+    function getLivingValue($index) {
+        echo $this->livingValue[$index];
+    }
+
+    function getLivingAdvice($index) {
+        echo $this->livingAdvice[$index];
     }
 }
 
 if (isset($parameter) && $parameter != "") {
     $dataObj->setData($parameter);
 } else {
-    $dataObj->setData("{\"location\":\"上海\",\"date\":\"7/13\",\"warning\":\"高温预警\",\"minTemp\":21,\"maxTemp\":30,\"weather\":4,\"wind\":\"南风微风\",\"livingIndex\":[\"紫外线\",\"紫外线\",\"紫外线\"],\"livingValue\":[\"三级\",\"三级\",\"三级\"],\"livingAdvice\":[\"注意防晒\",\"注意防晒\",\"注意防晒\"],\"aqi\":\"优\"}");
+    //$dataObj->setData("{\"result\": {\"livingIndex\": [\"污染扩散\", \"心情\", \"穿衣\"], \"maxTemp\": 33, \"livingAdvice\": [\"减少室外活动\", \"及时调整心情\", \"根据温度调整\"], \"aqi\": 73.85714285714286, \"minTemp\": 28, \"warning\": \"无预警\", \"weather\": \"4\", \"location\": \"上海\", \"quality\": \"AirType.MODERATE\", \"wind\": \"南\", \"livingValue\": [\"较差\", \"差\", \"炎热\"]}}");
 }
