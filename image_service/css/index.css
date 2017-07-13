@@ -55,11 +55,15 @@ img {
 }
 
 .weatherDiv {
-    margin-left: 25px;
-    margin-top: 15px;
-    font-size: 20px;
+    margin-left: 55px;
+    margin-top: 0px;
+    font-size: 22px;
     font-weight: bold;
     text-align: center;
+}
+
+.weatherDiv div {
+    padding: 3px 0;
 }
 
 .living {
@@ -72,11 +76,11 @@ img {
     float: left;
 }
 
-.livingValue {
+.livingAdvice {
     width: 150px;
 }
 
-.livingAdvice, .livingIndex {
+.livingValue, .livingIndex {
     width: 100px;
 }
 

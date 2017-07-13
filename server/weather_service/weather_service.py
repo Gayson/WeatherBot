@@ -13,6 +13,7 @@ from server import utils
 from server.enums import TimeStatus, WeatherType
 from server.view_models import PicMessage, ReplyMessage
 
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -33,6 +34,7 @@ class WeatherService(object):
         except Exception, e:
             print traceback.print_exc()
 
+
     def refresh(self):
         hour = TimeStatus.get_hour()
         for city in self.city_list.values():
@@ -42,7 +44,6 @@ class WeatherService(object):
             city.refresh_hour_weather(utils.filter_fetch_api(city_id, utils.API_LIST['WEATHER_HOURLY_API'], 1), hour)
             city.refresh_daily_air_index(utils.filter_fetch_api(city_id, utils.API_LIST['AIR_DAILY_API'], 1))
             city.refresh_hour_air_index(utils.filter_fetch_api(city_id, utils.API_LIST['AIR_HOURLY_API'], 1), hour)
-
             city.refresh_total_info(TimeStatus.get_status(), hour)
 
     '''
