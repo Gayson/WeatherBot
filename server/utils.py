@@ -40,6 +40,11 @@ def get_image_path():
     return setting.PROJECT_DIR + '/server/img/%s/%s.png' % (LOCATION, time.strftime("%m-%d", time.localtime(time.time())))
 
 
+# 图片数据临时文件路径
+def get_data_file_path():
+    return setting.PROJECT_DIR + '/image_service/data.txt'
+
+
 def fetch_api(location, api, days=0):
     params = get_params(location, days)
     response = requests.get(api, params=params).text
