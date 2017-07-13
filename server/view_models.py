@@ -58,7 +58,8 @@ class LifeMessage(object):
             'livingIndex': [],
             'livingAdvice': [],
             'livingValue': [],
-        }
+       		'details': []
+	   	}
 
         total_count = 0
         for i in range(0, len(LifeIndex.life_list)):

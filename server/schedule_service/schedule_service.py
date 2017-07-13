@@ -55,7 +55,6 @@ class ScheduleService(object):
                     self.pub_alarms.append(PublishedAlarm(alarm))
 
             self.pub_alarms = filter(lambda a: a.is_active(), self.pub_alarms)
-            print len(self.pub_alarms)
 
         if len(res_alarms) > 0:
             message = AlarmMessage(res_alarms)
