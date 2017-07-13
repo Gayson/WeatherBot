@@ -102,18 +102,14 @@ class WeatherService(object):
         message = ReplyMessage(city_name, hour, days)
         if hour != -1 and hour < CityInfo.START_HOUR:
             message.results = '这个点你就起床啦？看凌晨四点的太阳吗？'
-            return message
+            return message.results
         elif hour > CityInfo.END_HOUR:
             message.results = '这个点你不在家吗？这么舒服的吗？'
-            return message
-
+            return message.results
+	
         # 今日数据
-        if days == 0:
-
-            # 城市已缓存
-            if city_name in self.city_list.keys():
+        if days == 0 and city_name in self.city_list.keys():
                 city = self.city_list[city_name]
-
                 life_info = utils.filter_fetch_api(city.city_id, utils.API_LIST['LIFE_API'])
                 if hour == -1:
                     message.set_data(city.total_info['daily_weather'], city.total_info['daily_air_index'],
