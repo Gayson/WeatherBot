@@ -31,6 +31,14 @@ class AirType(enum.Enum):
     HEAVILY_POLLUTED = 4
     SEVERELY_POLLUTED = 5
 
+    def __new__(cls, value):
+        member = object.__new__(cls)
+        member._value_ = value
+        return member
+
+    def __int__(self):
+        return self._value_
+
     @staticmethod
     def get_air_type(aqi):
         if aqi <= 50:
@@ -145,6 +153,6 @@ class AlarmStatus(enum.Enum):
     INACTIVE = 1
 
 
-class ReplyTemplate(enum.Enum):
-    temp_1 = '今日最高气温%d度，最低气温%d度，%s，空气质量指数%d，%s\n' \
-             '%s。%s。%s。'
+class ReplyTemplate(object):
+    temp_1 = '%s%s工作时间最高气温%d度，最低气温%d度，%s，空气质量指数%d。\n%s%s%s'
+    temp_hour = '%s%s%s气温%d度，湿度%d，%s，空气质量指数%d。%s风，风速%.1f公里每小时。'

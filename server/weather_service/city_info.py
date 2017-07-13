@@ -78,4 +78,4 @@ class CityInfo(object):
             weather['low'] = low
             weather['high'] = high
 
-        air_index['quality'] = AirType.get_air_type(air_index['aqi'])
+        air_index['quality'] = int(AirType.get_air_type(air_index['aqi']))

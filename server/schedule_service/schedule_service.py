@@ -60,7 +60,7 @@ class ScheduleService(object):
 
         if len(res_alarms) > 0:
             message = AlarmMessage(res_alarms)
-            print message.results.encode('utf-8')
+            print message.result.encode('utf-8')
         else:
             print 'no alarm'
 
