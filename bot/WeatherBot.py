@@ -423,7 +423,7 @@ class WeatherBot(WXBot):
 
         print '推送图片'
         has_txt = True  # 存在第二条文本消息
-        weather_txt = "天气已推送"
+        weather_txt = "天气已推送~"
         if has_txt:
             self.push_msg_to_target_contact(weather_txt)
             self.push_msg_to_target_group(weather_txt)
@@ -482,6 +482,7 @@ class WeatherBot(WXBot):
     def handle_weather_query(self, msg, uid):
         try:
             days = [u"今天", u"明天", u"后天", u"大后天"]
+            '''
             key_words = [u"号", u"日"]
             day_code = 0
             for key_word in key_words:                         #判断是否有日期请求
@@ -497,9 +498,10 @@ class WeatherBot(WXBot):
             if now.month in [1,3,5,7,8,10,12]:                   #确定当前月天数
                 a_month = 31
             
-
+            '''
+            day_code = 0
             msg = msg.replace(u"天气", "")                                   #删除消息中的"天气"
-            for index in range(3, 0, -1):
+            for index in [3, 2, 1, 0]:
                 if msg.find(days[index]) != -1:
                     day_code = index
                     msg = msg.replace(days[index], "")                   #删除消息中的时间
