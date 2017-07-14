@@ -485,7 +485,7 @@ class WeatherBot(WXBot):
             key_words = [u"号", u"日"]
             day_code = 0
             for key_word in key_words:                         #判断是否有日期请求
-                index = msg.find(key_words)
+                index = msg.find(key_word)
                 if index != -1:
                     day_code = int(msg[index-1])
                     try:
