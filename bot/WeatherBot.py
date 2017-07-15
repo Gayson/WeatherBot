@@ -30,6 +30,7 @@ class WeatherBot(WXBot):
     target_contact = []                  # 需要推送的联系人
     target_group = []            # 需要推送的群
     admin_password = ""                  # 管理员口令
+    tuling_key = ""                      # 
 
     image_exist = False
 
@@ -54,11 +55,13 @@ class WeatherBot(WXBot):
             if now.hour == self.set_time["hour"] and now.minute == self.set_time["minute"]:
                 if (not self.push_flag) and self.image_exist:
                     print "Target Time!"
+                    '''
                     self.push_msg_to_target_contact(utils.get_image_path(), True)
                     self.push_msg_to_target_contact(u"今日定时天气预报已推送～")
                     self.push_msg_to_target_group(utils.get_image_path(), True)
                     self.push_msg_to_target_group(u"今日定时天气预报已推送～")
-                    #self.push_weather_information()
+                    '''
+                    self.push_weather_information()
                     self.push_flag = True
                 else:
                     self.push_flag = False
