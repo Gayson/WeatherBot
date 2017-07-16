@@ -40,6 +40,11 @@ def get_image_path():
     return setting.PROJECT_DIR + '/server/img/%s/%s.png' % (LOCATION, time.strftime("%m-%d", time.localtime(time.time())))
 
 
+# 图片数据临时文件路径
+def get_data_file_path():
+    return setting.PROJECT_DIR + '/image_service/data.txt'
+
+
 def fetch_api(location, api, days=0):
     params = get_params(location, days)
     response = requests.get(api, params=params).text
@@ -71,11 +76,10 @@ def filter_fetch_api(location, api, days=0):
     json_res = fetch_api(location, api, days)
     json_res = json_res['results'][0]
 
-    if days == 0:
-        day_index = 0
-    else:
-        day_index = days - 1
+    if days != 0:
+        days -= 1
 
+    # print json_res
     if api == API_LIST['LIFE_API']:
         return json_res['suggestion']
 
@@ -83,7 +87,7 @@ def filter_fetch_api(location, api, days=0):
         return json_res['alarms']
 
     if api == API_LIST['WEATHER_DAILY_API']:
-        return json_res['daily'][day_index]
+        return json_res['daily'][days]
 
     if api == API_LIST['WEATHER_NOW_API']:
         return json_res['now']
@@ -92,7 +96,7 @@ def filter_fetch_api(location, api, days=0):
         return json_res['hourly']
 
     if api == API_LIST['AIR_DAILY_API']:
-        return json_res['daily'][day_index]
+        return json_res['daily'][days]
       
     if api == API_LIST['AIR_HOURLY_API']:
         return json_res['hourly']

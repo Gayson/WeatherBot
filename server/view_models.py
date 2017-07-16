@@ -32,26 +32,6 @@ class PicMessage(object):
 
 
 class LifeMessage(object):
-    def __init__(self, life_info):
-        self.result = {
-            'livingIndex': [],
-            'livingAdvice': [],
-            'livingValue': [],
-            'details': [],
-        }
-
-        life_message = LifeMessage(life_info)
-        self.result = dict(self.result, **life_message.result)
-
-    @staticmethod
-    def get_alarm_brief(alarm_info):
-        alarms = alarm_info
-        if len(alarms) >= 1:
-            return alarms[0]['type'] + alarms[0]['level'] + '预警'
-        return '无预警'
-
-
-class LifeMessage(object):
 
     def __init__(self, life_info):
         self.result = {
@@ -83,18 +63,18 @@ class ReplyMessage(object):
         self.result = None
         self.location = city_name
 
-        if hour == -1 or days != 0:
+        if hour == -1 or days <= 1:
             self.hour = -1
             self.template = ReplyTemplate.temp_1
         else:
             self.hour = hour
             self.template = ReplyTemplate.temp_hour
 
-        if days == 0:
+        if days <= 1:
             self.day = '今日'
-        elif days == 1:
-            self.day = '明日'
         elif days == 2:
+            self.day = '明日'
+        elif days == 3:
             self.day = '后天'
         else:
             today = time.strftime('%d', time.localtime(time.time()))
