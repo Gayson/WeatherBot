@@ -15,7 +15,7 @@ sys.setdefaultencoding('utf-8')
 class ScheduleService(object):
     INTERVAL_WEATHER_REFRESH = 3600
     INTERVAL_ALARM_REFRESH = 180
-    INTERVAL_MESSAGE_REFRESH = 86400
+    INTERVAL_MESSAGE_REFRESH = 3600
 
     pub_alarms = []
 
@@ -40,7 +40,7 @@ class ScheduleService(object):
         print 'refresh weather service'
         self.weather_service.refresh()
         msg = self.weather_service.get_publish_message()
-        self.image_service.generate_image(msg, utils.get_image_path(), self.refresh_over())
+        self.image_service.generate_image(msg, utils.get_image_path(), self.refresh_over)
         self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, ())
 
     @staticmethod
