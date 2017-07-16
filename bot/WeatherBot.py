@@ -19,7 +19,7 @@ from server import utils
 #2.管理员通过聊天窗口进行快捷管理 #
 #3.响应普通用户和群内的天气请求   #
 #---------------------------------#
-#      2017.7.13 by 林顺达        #
+#      2017.7.13 by 爆炸开发小组  #
 #      linshunda@baixing.com      #
 #---------------------------------#
 class WeatherBot(WXBot):
@@ -30,7 +30,7 @@ class WeatherBot(WXBot):
     target_contact = []                  # 需要推送的联系人
     target_group = []            # 需要推送的群
     admin_password = ""                  # 管理员口令
-    tuling_key = ""                      # 
+    tuling_key = ""                      # 图灵机器人Key 
 
     image_exist = False
 
@@ -77,6 +77,7 @@ class WeatherBot(WXBot):
             self.target_contact = conf["target_contact"]
             self.target_group = conf["target_group"]
             self.admin_password = conf["admin_password"]
+            self.tuling_key = conf["tuling_key"]
             conf_file.close()
         except:  # 设置为默认值
             self.conf_fichedule_enable = True                            # 定时任务使能
@@ -85,6 +86,7 @@ class WeatherBot(WXBot):
             self.target_contact = [{"Name": "顺达"}]             # 需要推送的联系人
             self.target_group = [{"Name": "爆炸开发"}]           # 需要推送的群
             self.admin_password = u"天王盖地虎宝塔镇河妖"        # 默认管理员口令
+            self.tuling_key = conf[""]
 
     # 更新配置信息
     def set_conf(self):
@@ -96,6 +98,7 @@ class WeatherBot(WXBot):
         conf["target_contact"] = self.target_contact
         conf["target_group"] = self.target_group
         conf["admin_password"] = self.admin_password
+        conf["tuling_key"] = self.tuling_key
         conf_file.write(json.dumps(conf))
         conf_file.close()
 
@@ -170,6 +173,8 @@ class WeatherBot(WXBot):
             self.upgrade_to_admin(uid)
         elif command == u"帮助":
             self.check_help_info(uid)
+        else:
+            self.send_msg_by_uid(self.tuling_auto_reply(uid, command), uid)   #图灵机器人自动回复
 
     # ----------------------3.群消息响应----------------------
     # 1.响应@消息
@@ -550,9 +555,30 @@ class WeatherBot(WXBot):
     def set_image_exist(self):
         self.image_exist = True
 
-def none():
-    print 'none'
+#--------------------图灵机器人自动回复-------------------
+    def tuling_auto_reply(self, uid, msg):
+        if self.tuling_key:
+            url = "http://www.tuling123.com/openapi/api"
+            user_id = uid.replace("@","")[:30]
+            body = {"key": self.tuling_key, "info": msg.encode("utf8"), "userid": user_id}
+            r = requests.post(url, data=body)
+            respond = json.loads(r.text)
+            result = ""
+            if respond["code"] == 100000:
+                result = respond["text"].replace("<br>", " ")
+                result = result.replace(u"\xa0", u" ")
+            elif respond["code"] == 302000:
+                for k in respond["list"]:
+                    result = result + u"[" + k["source"] + u"]" +\
+                        k["article"] + "\t" + k["detailurl"] + "\n"
+            else:
+                result = respond["text"].replace("<br>", "")
+                result = result.replace(u"\xa0", u" ")
 
+            print "    RoBOT:", result
+            return result
+        else:
+            return u"知道啦"
 
 def main():
     # 启动天气服务
@@ -569,8 +595,8 @@ def main():
     # 启动图片渲染服务
     image_service = ImageService()
     image_service.generate_image(weather_service.get_publish_message(),
-                                utils.get_image_path(),
-                                bot.set_image_exist)
+                                 utils.get_image_path(),
+                                 bot.set_image_exist)
 
     # 启动定时服务
     schedule_service = ScheduleService(weather_service, bot, image_service)
