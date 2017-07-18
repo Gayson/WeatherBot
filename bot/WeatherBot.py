@@ -610,14 +610,14 @@ def main():
     bot.set_weather_service(weather_service)
 
     # 启动图片渲染服务
-    #image_service = ImageService()
-    #image_service.generate_image(weather_service.get_publish_message(),
-    #                             utils.get_image_path(),
-    #                             bot.set_image_exist)
+    image_service = ImageService()
+    image_service.generate_image(weather_service.get_publish_message(),
+                                 utils.get_image_path(),
+                                 bot.set_image_exist)
 
     # 启动定时服务
-    #schedule_service = ScheduleService(weather_service, bot, image_service)
-    #schedule_service.start_service()
+    schedule_service = ScheduleService(weather_service, bot, image_service)
+    schedule_service.start_service()
 
     bot.DEBUG = True
     bot.conf['qr'] = 'tty'
