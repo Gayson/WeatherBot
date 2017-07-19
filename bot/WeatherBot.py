@@ -28,9 +28,10 @@ class WeatherBot(WXBot):
     set_time = {}                                # 定时推送时间
     admin_list = []                      # 管理员列表
     target_contact = []                  # 需要推送的联系人
-    target_group = []            # 需要推送的群
+    target_group = []                    # 需要推送的群
     admin_password = ""                  # 管理员口令
     tuling_key = ""                      # 图灵机器人Key 
+    tuling_enable = True                 # 图灵机器人使能
 
     image_exist = False
 
@@ -78,6 +79,7 @@ class WeatherBot(WXBot):
             self.target_group = conf["target_group"]
             self.admin_password = conf["admin_password"]
             self.tuling_key = conf["tuling_key"]
+            self.tuling_enable = conf["tuling_enable"]
             conf_file.close()
         except:  # 设置为默认值
             self.conf_fichedule_enable = True                            # 定时任务使能
@@ -86,7 +88,8 @@ class WeatherBot(WXBot):
             self.target_contact = [{"Name": "顺达"}]             # 需要推送的联系人
             self.target_group = [{"Name": "爆炸开发"}]           # 需要推送的群
             self.admin_password = u"天王盖地虎宝塔镇河妖"        # 默认管理员口令
-            self.tuling_key = conf[""]
+            self.tuling_key = "aac7a9fa4e3f41ed83c072d9694688a7"
+            self.tuling_enable = True
 
     # 更新配置信息
     def set_conf(self):
@@ -99,6 +102,7 @@ class WeatherBot(WXBot):
         conf["target_group"] = self.target_group
         conf["admin_password"] = self.admin_password
         conf["tuling_key"] = self.tuling_key
+        conf["tuling_enable"] = self.tuling_enable
         conf_file.write(json.dumps(conf))
         conf_file.close()
 
@@ -160,7 +164,9 @@ class WeatherBot(WXBot):
         elif command == u"更新联系人列表":                                                                       # 11-"更新联系人列表"
             self.get_contact()
             self.send_msg_by_uid("更新成功", uid)
-        elif command == u"管理员":                                                                               # 11-"显示管理员命令列表"
+        elif command == u"图灵机器人":                                                                           # 12-"开关图灵机器人"
+            self.switch_tuling(uid)                                                                                     
+        elif command == u"管理员":                                                                               # 13-"显示管理员命令列表"
             self.check_admin_command_list(uid)
 
     # ----------------------2.通用命令响应--------------------
@@ -173,7 +179,7 @@ class WeatherBot(WXBot):
             self.upgrade_to_admin(uid)
         elif command == u"帮助":
             self.check_help_info(uid)
-        else:
+        elif self.tuling_enable:
             self.send_msg_by_uid(self.tuling_auto_reply(uid, command), uid)   #图灵机器人自动回复
 
     # ----------------------3.群消息响应----------------------
@@ -226,6 +232,10 @@ class WeatherBot(WXBot):
             self.send_msg_by_uid("定时群发： 开启", uid)
         else:
             self.send_msg_by_uid("定时群发:  关闭", uid)
+        if self.tuling_enable:
+            self.send_msg_by_uid("图灵机器人： 开启", uid)
+        else:
+            self.send_msg_by_uid("图灵机器人： 关闭", uid)
         reply = "当前设定时间：%i点%i分" % (self.set_time["hour"], self.set_time["minute"])
         self.send_msg_by_uid(reply, uid)
 
@@ -439,8 +449,17 @@ class WeatherBot(WXBot):
         print '推送第二条消息'
     
     # 11.更新联系人列表
+    
+    # 12.开关图灵机器人----"图灵机器人"
+    def switch_tuling(self, uid):
+        if self.tuling_enable:
+            self.tuling_enable = False
+            self.send_msg_by_uid("图灵机器人关闭", uid)
+        else:
+            self.tuling_enable = True
+            self.send_msg_by_uid("图灵机器人开启", uid)
 
-    # 12.显示管理员命令列表----"管理员"
+    # 13.显示管理员命令列表----"管理员"
     def check_admin_command_list(self, uid):
         reply = "管理员命令：\n"
         reply += "1.查看状态\n"
@@ -453,7 +472,8 @@ class WeatherBot(WXBot):
         reply += "8.添加推送:NickName\n"
         reply += "9.取消推送:NickName\n"
         reply += "10.立即推送\n"
-        reply += "11.更新联系人列表"
+        reply += "11.更新联系人列表\n"
+        reply += "12.图灵机器人"
         self.send_msg_by_uid(reply, uid)
 
     # -------------------------------------------------------------------------
