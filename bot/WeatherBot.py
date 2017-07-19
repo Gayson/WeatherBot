@@ -64,8 +64,8 @@ class WeatherBot(WXBot):
                     '''
                     self.push_weather_information()
                     self.push_flag = True
-                else:
-                    self.push_flag = False
+            else:
+                self.push_flag = False
 
     # 获取初始配置信息
     def load_conf(self):
@@ -509,7 +509,7 @@ class WeatherBot(WXBot):
     #处理天气请求,默认回复今天上海天气
     def handle_weather_query(self, msg, uid):
         try:
-            days = [u"今天", u"明天", u"后天", u"大后天"]
+            days = [u"今天", u"今天", u"明天", u"后天", u"大后天"]
             '''
             key_words = [u"号", u"日"]
             day_code = 0
@@ -529,7 +529,7 @@ class WeatherBot(WXBot):
             '''
             day_code = 0
             msg = msg.replace(u"天气", "")                                   #删除消息中的"天气"
-            for index in [3, 2, 1, 0]:
+            for index in [4, 3, 2, 1]:
                 if msg.find(days[index]) != -1:
                     day_code = index
                     msg = msg.replace(days[index], "")                   #删除消息中的时间
@@ -540,7 +540,7 @@ class WeatherBot(WXBot):
 
             self.push_weather_to_one(uid, city, day_code)
         except:
-            self.send_msg_by_uid("获取天气信息失败", uid)
+            self.send_msg_by_uid("无可奉告[皱眉]", uid)
 
     # ---------------------------通用群发函数----------------------------------
     # 群发消息给推送列表里的联系人
@@ -602,13 +602,16 @@ class WeatherBot(WXBot):
 
 def main():
     # 启动天气服务
+    print 'start'
     weather_service = WeatherService()
     weather_service.refresh()
 
+    print 'weather_service init over'
     # 启动机器人
     bot = WeatherBot()
     bot.set_weather_service(weather_service)
 
+    print 'image create over'
     # 启动图片渲染服务
     image_service = ImageService()
     image_service.generate_image(weather_service.get_publish_message(),
@@ -619,6 +622,7 @@ def main():
     schedule_service = ScheduleService(weather_service, bot, image_service)
     schedule_service.start_service()
 
+    print 'start schedule'
     bot.DEBUG = True
     bot.conf['qr'] = 'tty'
     bot.run()

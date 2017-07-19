@@ -2,20 +2,20 @@
 import sched
 import time
 import sys
-from server.render.pic_render import PicRender
 from server import utils
 from alarm_info import PublishedAlarm
 from server.view_models import AlarmMessage
 import server.utils
 import threading
-
+from server.weather_service.weather_service import WeatherService
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
 
 class ScheduleService(object):
     INTERVAL_WEATHER_REFRESH = 3600
-    INTERVAL_ALARM_REFRESH = 3
+    INTERVAL_ALARM_REFRESH = 180
+    INTERVAL_MESSAGE_REFRESH = 3600
 
     pub_alarms = []
 
@@ -25,15 +25,22 @@ class ScheduleService(object):
         self.image_service = image_service
 
         self.schedule = sched.scheduler(time.time, time.sleep)
-        self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, self.refresh_over)
+
+        # 刷新city_list的缓存以及图片更新
+        self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, ())
+
+        # 获取预警消息
         self.schedule.enter(self.INTERVAL_ALARM_REFRESH, 0, self.fetch_alarm, (utils.LOCATION,))
 
+        # 刷新消息缓存
+        self.schedule.enter(self.INTERVAL_MESSAGE_REFRESH, 2, self.refresh_message_cache, ())
+
     def refresh_cache(self):
+
+        print 'refresh weather service'
         self.weather_service.refresh()
         msg = self.weather_service.get_publish_message()
-
-        img_path = utils.IMAGE_PATH % (utils.LOCATION, time.strftime("%M-%d", time.localtime(time.time())))
-        self.image_service.generate_image(msg, img_path, )
+        self.image_service.generate_image(msg, utils.get_image_path(), self.refresh_over)
         self.schedule.enter(self.INTERVAL_WEATHER_REFRESH, 1, self.refresh_cache, ())
 
     @staticmethod
@@ -41,6 +48,8 @@ class ScheduleService(object):
         print 'refresh over'
 
     def fetch_alarm(self, location):
+
+        print 'fetch alarm'
         alarms = utils.filter_fetch_api(location, utils.API_LIST['ALARM_API'])
 
         res_alarms = []
@@ -68,6 +77,13 @@ class ScheduleService(object):
             self.bot.push_msg_to_target_group(message.result, False)
 
         self.schedule.enter(self.INTERVAL_ALARM_REFRESH, 0, self.fetch_alarm, (location,))
+
+    def refresh_message_cache(self):
+
+        print 'refresh message cache'
+        self.weather_service.reply_msgs.clear()
+
+        self.schedule.enter(self.INTERVAL_MESSAGE_REFRESH, 2, self.refresh_message_cache, ())
 
     def start_service(self):
         sched_thread = threading.Thread(target=self.schedule.run, args=())

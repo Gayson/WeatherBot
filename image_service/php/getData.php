@@ -1,6 +1,8 @@
 <?php
 try {
-    $parameter = $_GET['data'];
+    $dataFile = "data.txt";
+    $myfile = fopen($dataFile, "r") or die("Unable to open file!");
+    $parameter = fread($myfile,filesize($dataFile));
 } catch (Exception $e) {
 }
 
@@ -10,7 +12,7 @@ require('util.php');
 
 class Data {
     private $location, $date, $warning, $aqi, $aqiQuality, $maxTemp, $minTemp,
-        $weather, $icon, $imgPath, $wind, $humidity;
+        $weather, $icon, $imgPath, $wind;
     private $livingIndex, $livingValue, $livingAdvice;
 
     function setData($jsonData) {
@@ -24,7 +26,6 @@ class Data {
         $this->maxTemp = $data->{'maxTemp'};
         $this->minTemp = $data->{'minTemp'};
         $this->wind = $data->{'wind'}.'风';
-        $this->humidity = $data->{'humidity'};
 
         code2weather($data->{'weather'}, $this->weather, $this->icon, $this->imgPath);
         code2AqiQuality($data->{'quality'}, $this->aqiQuality);
@@ -73,10 +74,6 @@ class Data {
 
     function getWind() {
         echo $this->wind;
-    }
-
-    function getHumidity() {
-        echo $this->humidity;
     }
 
     function getLivingIndex($index) {
